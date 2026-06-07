@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -667,137 +666,317 @@ update();
 // ─── KAREN IA ────────────────────────────────────────────────
 let chatOpen=false;
 
-// Normalizar texto: quitar tildes, signos y pasar a minúscula
 function norm(s){
-  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿¡.,!?]/g,'').trim();
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿¡.,!?;:""]/g,'').replace(/\s+/g,' ').trim();
 }
 
-// Base de conocimiento: exact = match exacto/inclusión, k = keywords generales
 const KB=[
-  // ── PERSONA ──
-  { exact:['quien fue ohm','quien es ohm','quien fue georg ohm','quien fue georg simon ohm',
-           'quien fue el inventor','quien descubrio','historia de ohm','vida de ohm',
-           'quien creo la ley','quienes fue ohm','quien invento','creador de la ley',
-           'cuando nacio ohm','biografia de ohm','georg simon','georg ohm'],
-    k:['quien fue','quien es','georg','inventor','descubrio','creo la ley','biografia'],
-    r:`**Georg Simon Ohm** (1789 – 1854) fue un físico y matemático alemán nacido en Erlangen, Baviera.\n\n📖 En **1827** publicó *"Die galvanische Kette, mathematisch bearbeitet"*, obra en la que formuló la ley que lleva su nombre.\n\n🏅 Su trabajo fue inicialmente rechazado, pero en **1841** recibió la **Medalla Copley** por sus aportes.\n\n⚡ En su honor la unidad de resistencia eléctrica se llama **Ohmio (Ω)**.` },
+  // ══ PERSONA / HISTORIA ══
+  {exact:['quien fue ohm','quien es ohm','quien fue georg ohm','quien fue georg simon ohm',
+          'quien fue el inventor','quien descubrio la ley','historia de ohm','vida de ohm',
+          'quien creo la ley','quien invento la ley de ohm','creador de la ley',
+          'cuando nacio ohm','cuando murio ohm','biografia de ohm','georg simon','georg ohm',
+          'quien era ohm','quien es georg ohm','de donde era ohm','de donde era georg ohm'],
+   k:['quien fue','quien es','georg','inventor','descubrio','creo la ley','biografia','nacio ohm','murio ohm'],
+   r:`**Georg Simon Ohm** (1789–1854) fue un físico y matemático alemán nacido en Erlangen, Baviera.\n\n📖 En **1827** publicó *"Die galvanische Kette, mathematisch bearbeitet"*, donde formuló la ley que lleva su nombre.\n\n🏅 Su trabajo fue inicialmente rechazado, pero en **1841** recibió la **Medalla Copley** de la Royal Society.\n\n🎓 También fue profesor de matemáticas y física durante gran parte de su vida.\n\n⚡ La unidad de resistencia eléctrica, el **Ohmio (Ω)**, lleva su nombre en su honor.`},
 
-  // ── LEY DE OHM ──
-  { exact:['que es la ley de ohm','que es ohm','ley de ohm','definicion de la ley de ohm',
-           'explicame la ley de ohm','como funciona la ley de ohm','para que sirve la ley de ohm'],
-    k:['que es la ley','ley de ohm','definicion','explica la ley'],
-    r:`**La Ley de Ohm** establece que la tensión (V) en un conductor es directamente proporcional a la corriente (I) que circula, siendo la constante de proporcionalidad la resistencia (R).\n\n⚡ **V = I × R**\n\nFue formulada por Georg Ohm en 1827 y es la base de toda la electrónica moderna.` },
+  // ══ QUÉ ES LA LEY DE OHM ══
+  {exact:['que es la ley de ohm','ley de ohm','definicion de la ley de ohm',
+          'explicame la ley de ohm','como funciona la ley de ohm','para que sirve la ley de ohm',
+          'describe la ley de ohm','cuál es la ley de ohm','cual es la ley de ohm',
+          'en que consiste la ley de ohm','que dice la ley de ohm','la ley de ohm'],
+   k:['ley de ohm','que es la ley','definicion de ohm','explica la ley','describe la ley','dice la ley'],
+   r:`**La Ley de Ohm** establece que la tensión (V) aplicada a un conductor es **directamente proporcional** a la corriente (I) que circula por él, siendo la constante de proporcionalidad la resistencia (R).\n\n⚡ Fórmula: **V = I × R**\n\n📌 Esto significa:\n• Si sube el voltaje → sube la corriente\n• Si sube la resistencia → baja la corriente\n\nFue formulada en 1827 y es la base de toda la electrónica moderna.`},
 
-  // ── FÓRMULAS (las 3) ──
-  { exact:['cuales son las formulas','las formulas','formulas de la ley de ohm',
-           'todas las formulas','muestra las formulas','cuales son las ecuaciones',
-           'ecuaciones de ohm','formulas de ohm'],
-    k:['cuales son las formulas','todas las formulas','formulas de ohm','las tres formulas','las 3 formulas'],
-    r:`Las **3 fórmulas** de la Ley de Ohm:\n\n🔵 **Voltaje:**     V = I × R\n🟡 **Corriente:**   I = V ÷ R\n🔴 **Resistencia:** R = V ÷ I\n\n💚 **Potencia:**    P = V × I = I² × R = V² ÷ R` },
+  // ══ LAS 3 FÓRMULAS ══
+  {exact:['cuales son las formulas','las formulas','formulas de la ley de ohm','todas las formulas',
+          'muestra las formulas','cuales son las ecuaciones','ecuaciones de ohm','formulas de ohm',
+          'las tres formulas','las 3 formulas','dame las formulas','que formulas hay',
+          'cuantas formulas tiene','cuantas formulas hay'],
+   k:['cuales son las formulas','todas las formulas','formulas de ohm','las tres formulas','las 3 formulas','dame las formulas'],
+   r:`Las **3 fórmulas** de la Ley de Ohm:\n\n🔵 **Voltaje:**     V = I × R\n🟡 **Corriente:**   I = V ÷ R\n🔴 **Resistencia:** R = V ÷ I\n\n💚 **Potencia (bonus):** P = V × I = I² × R = V² ÷ R\n\n💡 Truco: usa el **triángulo VIR** — cubre la que quieres calcular y el triángulo te muestra la fórmula.`},
 
-  // ── FORMULA VOLTAJE ──
-  { exact:['formula del voltaje','formula de voltaje','como calculo el voltaje',
-           'calcular voltaje','despejar v','despejar voltaje','como saco el voltaje'],
-    k:['formula voltaje','calcular voltaje','despejar v'],
-    r:`Para calcular el **Voltaje**:\n\n🔵 **V = I × R**\n\nEjemplo: I = 2 A y R = 6 Ω\nV = 2 × 6 = **12 V**` },
+  // ══ FÓRMULA VOLTAJE ══
+  {exact:['formula del voltaje','formula de voltaje','como calculo el voltaje',
+          'calcular voltaje','despejar v','despejar voltaje','como saco el voltaje',
+          'como encuentro el voltaje','como se calcula el voltaje','ecuacion del voltaje'],
+   k:['formula voltaje','calcular voltaje','despejar v','como saco v','ecuacion voltaje'],
+   r:`Para calcular el **Voltaje**:\n\n🔵 **V = I × R**\n\n📐 Ejemplo:\nSi I = 2 A y R = 6 Ω\nV = 2 × 6 = **12 V**\n\n💡 Voltaje = Corriente × Resistencia`},
 
-  // ── FORMULA CORRIENTE ──
-  { exact:['formula de la corriente','formula de corriente','como calculo la corriente',
-           'calcular corriente','despejar i','despejar corriente','como saco la corriente'],
-    k:['formula corriente','calcular corriente','despejar i'],
-    r:`Para calcular la **Corriente**:\n\n🟡 **I = V ÷ R**\n\nEjemplo: V = 9 V y R = 3 Ω\nI = 9 ÷ 3 = **3 A**` },
+  // ══ FÓRMULA CORRIENTE ══
+  {exact:['formula de la corriente','formula de corriente','como calculo la corriente',
+          'calcular corriente','despejar i','despejar corriente','como saco la corriente',
+          'como encuentro la corriente','como se calcula la corriente','ecuacion de la corriente'],
+   k:['formula corriente','calcular corriente','despejar i','como saco i','ecuacion corriente'],
+   r:`Para calcular la **Corriente**:\n\n🟡 **I = V ÷ R**\n\n📐 Ejemplo:\nSi V = 9 V y R = 3 Ω\nI = 9 ÷ 3 = **3 A**\n\n💡 Corriente = Voltaje ÷ Resistencia`},
 
-  // ── FORMULA RESISTENCIA ──
-  { exact:['formula de la resistencia','formula de resistencia','como calculo la resistencia',
-           'calcular resistencia','despejar r','despejar resistencia','como saco la resistencia'],
-    k:['formula resistencia','calcular resistencia','despejar r'],
-    r:`Para calcular la **Resistencia**:\n\n🔴 **R = V ÷ I**\n\nEjemplo: V = 12 V e I = 3 A\nR = 12 ÷ 3 = **4 Ω**` },
+  // ══ FÓRMULA RESISTENCIA ══
+  {exact:['formula de la resistencia','formula de resistencia','como calculo la resistencia',
+          'calcular resistencia','despejar r','despejar resistencia','como saco la resistencia',
+          'como encuentro la resistencia','como se calcula la resistencia','ecuacion de la resistencia'],
+   k:['formula resistencia','calcular resistencia','despejar r','como saco r','ecuacion resistencia'],
+   r:`Para calcular la **Resistencia**:\n\n🔴 **R = V ÷ I**\n\n📐 Ejemplo:\nSi V = 12 V e I = 3 A\nR = 12 ÷ 3 = **4 Ω**\n\n💡 Resistencia = Voltaje ÷ Corriente`},
 
-  // ── POTENCIA ──
-  { exact:['que es la potencia','potencia electrica','formula de la potencia',
-           'calcular potencia','como se calcula la potencia','que son los vatios','que son los watts'],
-    k:['que es potencia','formula potencia','calcular potencia','vatios','watts','watt','joule'],
-    r:`**Potencia eléctrica** — energía consumida por segundo.\n\n💚 Fórmulas:\n• P = V × I\n• P = I² × R\n• P = V² ÷ R\n\nUnidad: **Vatio (W)** = 1 Joule/segundo` },
+  // ══ POTENCIA ══
+  {exact:['que es la potencia','potencia electrica','formula de la potencia','calcular potencia',
+          'como se calcula la potencia','que son los vatios','que son los watts','que es un vatio',
+          'que es watt','para que sirve la potencia','potencia en electricidad','que es p'],
+   k:['que es potencia','formula potencia','calcular potencia','vatios','watts','watt','joule','que es p ='],
+   r:`**Potencia eléctrica (P)** — energía consumida o entregada por segundo.\n\n💚 Fórmulas:\n• **P = V × I**\n• P = I² × R\n• P = V² ÷ R\n\nUnidad: **Vatio (W)** = 1 Joule / segundo\n\n📐 Ejemplo:\n12 V × 3 A = **36 W**\n\n⚡ Un foco de 60 W consume 60 Joules cada segundo.`},
 
-  // ── QUÉ ES VOLTAJE ──
-  { exact:['que es el voltaje','que es la tension','que es la diferencia de potencial',
-           'que son los voltios','voltaje es','define voltaje'],
-    k:['que es el voltaje','que es tension','que son voltios','define voltaje'],
-    r:`El **Voltaje (V)** es la diferencia de potencial eléctrico entre dos puntos. Representa la "fuerza" que empuja los electrones.\n\n💧 Analogía: la **presión del agua** en una tubería.\n\nUnidad: **Voltio (V)**` },
+  // ══ VOLTAJE ══
+  {exact:['que es el voltaje','que es la tension','que es la diferencia de potencial',
+          'que son los voltios','define voltaje','que mide el voltaje','para que sirve el voltaje',
+          'que es la fuerza electromotriz','que es emf','que es fem'],
+   k:['que es el voltaje','que es tension','que son voltios','define voltaje','diferencia de potencial'],
+   r:`El **Voltaje (V)** es la diferencia de potencial eléctrico entre dos puntos. Representa la "fuerza" que empuja a los electrones a través del conductor.\n\n💧 Analogía: es como la **presión del agua** en una tubería.\n\nUnidad: **Voltio (V)**\n\n📌 A mayor voltaje → más fuerza → más corriente (si R es constante).`},
 
-  // ── QUÉ ES CORRIENTE ──
-  { exact:['que es la corriente','que es la corriente electrica',
-           'que son los amperios','corriente es','define corriente','que es un amperio'],
-    k:['que es la corriente','que son amperios','define corriente','que es corriente'],
-    r:`La **Corriente (I)** es el flujo de electrones a través de un conductor.\n\n🌊 Analogía: el **caudal de agua** en una tubería.\n\n1 Amperio = 1 Coulomb por segundo\n\nUnidad: **Amperio (A)**` },
+  // ══ CORRIENTE ══
+  {exact:['que es la corriente','que es la corriente electrica','que son los amperios',
+          'corriente electrica','define corriente','que es un amperio','que mide la corriente',
+          'para que sirve la corriente','que es i','que es la intensidad'],
+   k:['que es la corriente','que son amperios','define corriente','que es corriente','intensidad electrica'],
+   r:`La **Corriente (I)** es el flujo de electrones (cargas eléctricas) que circula a través de un conductor.\n\n🌊 Analogía: el **caudal de agua** en una tubería.\n\n1 Amperio = 1 Coulomb por segundo\n\nUnidad: **Amperio (A)**\n\n📌 Más resistencia → menos corriente (si V es constante).`},
 
-  // ── QUÉ ES RESISTENCIA ──
-  { exact:['que es la resistencia','que son los ohmios','que es un ohmio','ohmio que es',
-           'que es el ohm','define resistencia','resistencia electrica es'],
-    k:['que es la resistencia','que son ohmios','define resistencia'],
-    r:`La **Resistencia (R)** es la oposición que ofrece un material al paso de la corriente.\n\n🪨 Analogía: una **tubería estrecha** que dificulta el paso del agua.\n\nUnidad: **Ohmio (Ω)**` },
+  // ══ RESISTENCIA ══
+  {exact:['que es la resistencia','que son los ohmios','que es un ohmio','ohmio que es',
+          'que es el ohm','define resistencia','resistencia electrica','que mide la resistencia',
+          'para que sirve la resistencia','que es r','que es omega'],
+   k:['que es la resistencia','que son ohmios','define resistencia','que es omega','que es un ohm'],
+   r:`La **Resistencia (R)** es la oposición que ofrece un material al paso de la corriente eléctrica.\n\n🪨 Analogía: una **tubería estrecha** que dificulta el paso del agua.\n\nUnidad: **Ohmio (Ω)**\n\n📌 Depende del material, longitud y grosor del conductor.\n• Más largo → más resistencia\n• Más grueso → menos resistencia`},
 
-  // ── CONDUCTORES ──
-  { exact:['que son los conductores','materiales conductores','que es un conductor',
-           'cuales son los conductores','ejemplo de conductor'],
-    k:['que son conductores','materiales conductores','conductor electrico'],
-    r:`Los **conductores** son materiales con baja resistencia que permiten el flujo libre de electrones.\n\n🔌 Ejemplos: **Cobre (Cu)**, Plata (Ag), Oro (Au), Aluminio (Al)\n\nSe usan en cables y circuitos eléctricos.` },
+  // ══ CONDUCTORES ══
+  {exact:['que son los conductores','materiales conductores','que es un conductor',
+          'cuales son los conductores','ejemplo de conductor','que materiales conducen',
+          'que materiales son conductores','metales conductores'],
+   k:['que son conductores','materiales conductores','conductor electrico','metales conductores'],
+   r:`Los **conductores** son materiales con baja resistencia que permiten el flujo libre de electrones.\n\n🔌 Mejores conductores:\n1. Plata (Ag) — la mejor\n2. **Cobre (Cu)** — la más usada\n3. Oro (Au)\n4. Aluminio (Al)\n5. Hierro (Fe)\n\nSe usan en cables, circuitos y componentes eléctricos.`},
 
-  // ── AISLANTES ──
-  { exact:['que son los aislantes','materiales aislantes','que es un aislante',
-           'cuales son los aislantes','ejemplo de aislante'],
-    k:['que son aislantes','materiales aislantes','aislante electrico'],
-    r:`Los **aislantes** tienen resistencia muy alta e impiden el paso de la corriente.\n\n🧱 Ejemplos: Vidrio, plástico, madera seca, caucho, cerámica.\n\nSe usan para proteger los conductores.` },
+  // ══ AISLANTES ══
+  {exact:['que son los aislantes','materiales aislantes','que es un aislante',
+          'cuales son los aislantes','ejemplo de aislante','que materiales no conducen',
+          'que materiales son aislantes'],
+   k:['que son aislantes','materiales aislantes','aislante electrico'],
+   r:`Los **aislantes** tienen resistencia muy alta e impiden el paso de la corriente.\n\n🧱 Ejemplos comunes:\n• Vidrio\n• Plástico / PVC\n• Madera seca\n• Caucho / hule\n• Cerámica\n• Aire (en condiciones normales)\n\nSe usan para recubrir cables y proteger a las personas.`},
 
-  // ── CIRCUITO SERIE ──
-  { exact:['circuito en serie','que es un circuito en serie','que es circuito serie',
-           'como funciona el circuito serie','resistencias en serie'],
-    k:['circuito serie','en serie','resistencias serie'],
-    r:`**Circuito en Serie:**\n• La corriente I es **igual** en todos los componentes\n• El voltaje se **reparte**: V_total = V₁ + V₂ + …\n• La resistencia **suma**: R_total = R₁ + R₂ + …` },
+  // ══ SEMICONDUCTORES ══
+  {exact:['que son los semiconductores','que es un semiconductor','ejemplo de semiconductor',
+          'cuales son los semiconductores','para que sirven los semiconductores'],
+   k:['semiconductor','semiconductores'],
+   r:`Los **semiconductores** tienen resistencia intermedia entre conductores y aislantes.\n\n💻 Ejemplos:\n• **Silicio (Si)** — el más común\n• Germanio (Ge)\n• Arseniuro de galio (GaAs)\n\nSon la base de los transistores, chips y toda la electrónica moderna 🖥️`},
 
-  // ── CIRCUITO PARALELO ──
-  { exact:['circuito en paralelo','que es un circuito en paralelo','que es circuito paralelo',
-           'como funciona el circuito paralelo','resistencias en paralelo'],
-    k:['circuito paralelo','en paralelo','resistencias paralelo'],
-    r:`**Circuito en Paralelo:**\n• El voltaje V es **igual** en todos los componentes\n• La corriente **suma**: I_total = I₁ + I₂ + …\n• La resistencia: 1/R_total = 1/R₁ + 1/R₂ + …` },
+  // ══ CIRCUITO SERIE ══
+  {exact:['circuito en serie','que es un circuito en serie','que es circuito serie',
+          'como funciona el circuito serie','resistencias en serie','diferencia serie paralelo',
+          'cuando usar serie'],
+   k:['circuito serie','en serie','resistencias serie'],
+   r:`**Circuito en Serie** 🔴🔴🔴 (uno tras otro)\n\n• La corriente I es **igual** en todos los elementos\n• El voltaje se **divide**: V_t = V₁ + V₂ + V₃\n• La resistencia **suma**: R_t = R₁ + R₂ + R₃\n\n📌 Si uno falla → todo el circuito se apaga (ej: luces viejas de navidad).`},
 
-  // ── CIRCUITO GENERAL ──
-  { exact:['que es un circuito','que es un circuito electrico','tipos de circuito',
-           'circuito electrico','para que sirve un circuito'],
-    k:['que es circuito','tipos circuito','circuito electrico'],
-    r:`Un **circuito eléctrico** es un camino cerrado por el que circula la corriente.\n\n🔄 Tipos:\n• **Serie:** corriente igual en todos\n• **Paralelo:** voltaje igual en todos\n• **Mixto:** combinación de ambos` },
+  // ══ CIRCUITO PARALELO ══
+  {exact:['circuito en paralelo','que es un circuito en paralelo','que es circuito paralelo',
+          'como funciona el circuito paralelo','resistencias en paralelo','cuando usar paralelo'],
+   k:['circuito paralelo','en paralelo','resistencias paralelo'],
+   r:`**Circuito en Paralelo** 🔵||🔵 (lado a lado)\n\n• El voltaje V es **igual** en todos los elementos\n• La corriente **se divide**: I_t = I₁ + I₂ + I₃\n• La resistencia total **baja**: 1/R_t = 1/R₁ + 1/R₂ + …\n\n📌 Si uno falla → los demás siguen funcionando (ej: enchufes de tu casa).`},
 
-  // ── EJEMPLOS REALES ──
-  { exact:['ejemplos reales','ejemplos de la ley de ohm','aplicaciones reales',
-           'aplicaciones de la ley de ohm','vida real','ejemplos practicos',
-           'donde se aplica','para que se usa'],
-    k:['ejemplos reales','aplicaciones reales','vida real','ejemplo practico','donde se aplica'],
-    r:`**Aplicaciones reales de la Ley de Ohm:**\n\n💡 Bombilla 120 V / 1440 Ω → I = 0.083 A, P = 10 W\n🚗 Batería 12 V / motor 0.5 Ω → I = 24 A, P = 288 W\n📱 Cargador 5 V / cable 0.1 Ω → caída = 0.2 V\n🔌 Cualquier circuito doméstico la usa` },
+  // ══ DIFERENCIA SERIE/PARALELO ══
+  {exact:['diferencia entre serie y paralelo','diferencia serie y paralelo',
+          'cual es la diferencia entre serie y paralelo','serie vs paralelo'],
+   k:['diferencia serie paralelo','serie vs paralelo'],
+   r:`**Serie vs Paralelo:**\n\n| | **Serie** | **Paralelo** |\n|---|---|---|\n| Corriente | Igual | Se divide |\n| Voltaje | Se divide | Igual |\n| R total | Suma | Disminuye |\n| Si uno falla | Todo se apaga | Los demás siguen |\n\n🏠 Tu casa usa paralelo para que cada aparato funcione igual.`},
 
-  // ── VECTORES ──
-  { exact:['que son los vectores','que es un vector','vectores en fisica',
-           'vectores electricos','como se ven los vectores','para que sirven los vectores'],
-    k:['que son vectores','vector electrico','vectores en fisica'],
-    r:`En este simulador los **vectores** representan magnitudes con dirección y longitud proporcional:\n\n🔵 **V** → proporcional al voltaje\n🟡 **I** → proporcional a la corriente\n🔴 **R** → proporcional a la resistencia\n\nVélos en la sección "Visualización Vectorial" ↑` },
+  // ══ CIRCUITO MIXTO ══
+  {exact:['circuito mixto','que es un circuito mixto','como funciona circuito mixto'],
+   k:['circuito mixto'],
+   r:`Un **circuito mixto** combina elementos en **serie y en paralelo**.\n\n📐 Para analizarlo:\n1. Identificar las partes en paralelo → calcular su R equivalente\n2. Sumar esa R equivalente con las que están en serie\n3. Aplicar la Ley de Ohm normalmente\n\n🔑 Divide el circuito en partes simples y resuélvelas paso a paso.`},
 
-  // ── EQUIPO GAES ──
-  { exact:['quien hizo esto','quienes hicieron esto','el equipo','proyecto gaes',
-           'gaes','quienes son','quien lo hizo'],
-    k:['proyecto gaes','gaes','equipo','quienes son','quien hizo'],
-    r:`¡Proyecto GAES hecho con 💙 por:\n\n👩‍🔬 Edier Bejarano\n👩‍🔬 Karen Carrero\n👨‍🔬 Juan Zarate\n👩‍🔬 Luz Reyes\n👨‍🔬 Carlos Mendez\n\n¡Un equipo increíble! ⚡` },
+  // ══ EJEMPLOS REALES ══
+  {exact:['ejemplos reales','ejemplos de la ley de ohm','aplicaciones reales',
+          'aplicaciones de la ley de ohm','vida real','ejemplos practicos',
+          'donde se aplica','para que se usa la ley de ohm','en que se usa ohm'],
+   k:['ejemplos reales','aplicaciones reales','vida real','ejemplo practico','donde se aplica','para que se usa'],
+   r:`**Aplicaciones reales de la Ley de Ohm:**\n\n💡 Bombilla (120 V / 1440 Ω) → I = 0.083 A, P = 10 W\n🚗 Batería de auto (12 V / 0.5 Ω) → I = 24 A, P = 288 W\n📱 Cargador celular (5 V / 0.1 Ω) → I = 50 A (limita el chip)\n🔊 Altavoz (8 Ω, 2 A) → V = 16 V\n⚡ Fusibles, dimmer, reguladores de voltaje\n🔌 Todo circuito eléctrico en tu hogar`},
 
-  // ── GRACIAS ──
-  { exact:['gracias','muchas gracias','thanks','thank you','gracias karen','muy bien'],
-    k:['gracias','thanks'],
-    r:`¡Con mucho gusto! 😊 Si tienes más dudas sobre Física Eléctrica, aquí estoy. ¡Éxito en el proyecto GAES! ⚡` },
+  // ══ LEY DE KIRCHHOFF ══
+  {exact:['que es la ley de kirchhoff','kirchhoff','leyes de kirchhoff','ley de kirchhoff'],
+   k:['kirchhoff','leyes de kirchhoff'],
+   r:`Las **Leyes de Kirchhoff** complementan la Ley de Ohm:\n\n🔵 **KCL (nodos):** La suma de corrientes que entran a un nodo = suma de las que salen.\n\n🔴 **KVL (mallas):** La suma de voltajes en una malla cerrada = 0.\n\nSon fundamentales para analizar circuitos complejos con múltiples fuentes y ramas.`},
 
-  // ── SALUDOS ──
-  { exact:['hola','hi','hey','buenas','buenos dias','buenas tardes','buenas noches','hola karen'],
-    k:['hola','hi','hey','buenas'],
-    r:`¡Hola! 👋 Soy **Karen**, tu asistente de Física Eléctrica del proyecto GAES.\n\n¿Qué quieres aprender hoy sobre la Ley de Ohm? ⚡` },
+  // ══ QUÉ ES UN ELECTRON ══
+  {exact:['que es un electron','que son los electrones','como se mueven los electrones',
+          'que son las cargas electricas','que es la carga electrica','que es un coulomb'],
+   k:['que es electron','electrones','cargas electricas','coulomb'],
+   r:`Los **electrones** son partículas subatómicas con carga negativa que orbitan el núcleo de los átomos.\n\n⚡ En los conductores, los electrones **libres** se mueven cuando hay una diferencia de potencial (voltaje).\n\n🔢 1 Coulomb = 6.24 × 10¹⁸ electrones\n\nEse movimiento ordenado de electrones es lo que llamamos **corriente eléctrica**.`},
+
+  // ══ RESISTIVIDAD ══
+  {exact:['que es la resistividad','resistividad','de que depende la resistencia',
+          'que factores afectan la resistencia','por que cambia la resistencia'],
+   k:['resistividad','de que depende resistencia','factores resistencia'],
+   r:`La **resistencia** de un conductor depende de:\n\n📏 **Longitud (L):** más largo → más resistencia\n⭕ **Área (A):** más grueso → menos resistencia\n🧪 **Material (ρ):** cada material tiene su resistividad\n🌡️ **Temperatura:** más calor → más resistencia (en metales)\n\n**Fórmula:** R = ρ × L / A`},
+
+  // ══ QUÉ ES UN VOLTÍMETRO ══
+  {exact:['que es un voltimetro','voltimetro','como se usa el voltimetro','para que sirve el voltimetro'],
+   k:['voltimetro','que mide voltimetro'],
+   r:`El **voltímetro** es el instrumento que mide el **voltaje** (diferencia de potencial).\n\n🔌 Se conecta **en paralelo** con el elemento que se quiere medir.\n\n📌 Tiene resistencia interna muy alta para no alterar el circuito.\n\n💡 Los voltímetros digitales (multímetros) son los más comunes hoy en día.`},
+
+  // ══ QUÉ ES UN AMPERÍMETRO ══
+  {exact:['que es un amperimetro','amperimetro','como se usa el amperimetro','para que sirve el amperimetro'],
+   k:['amperimetro','que mide amperimetro'],
+   r:`El **amperímetro** es el instrumento que mide la **corriente eléctrica**.\n\n🔌 Se conecta **en serie** con el circuito (el flujo pasa por él).\n\n📌 Tiene resistencia interna muy baja para no obstruir la corriente.\n\n💡 En un multímetro puedes configurarlo en modo "A" para medir amperios.`},
+
+  // ══ QUÉ ES UN OHMÍMETRO ══
+  {exact:['que es un ohmetro','ohmetro','ohmimetro','como se mide la resistencia',
+          'como mido la resistencia','instrumento para medir resistencia'],
+   k:['ohmetro','medir resistencia','ohmimetro'],
+   r:`El **óhmetro** (u ohmímetro) mide la **resistencia eléctrica**.\n\n⚠️ Se mide con el **circuito apagado** (sin corriente).\n\n🔌 Se conecta en paralelo con el componente a medir.\n\n💡 En un multímetro, selecciona el modo "Ω" para medir resistencia.`},
+
+  // ══ MULTÍMETRO ══
+  {exact:['que es un multimetro','multimetro','como se usa el multimetro','para que sirve el multimetro'],
+   k:['multimetro','tester'],
+   r:`El **multímetro** (o tester) es un instrumento que mide **voltaje, corriente y resistencia** en un solo aparato.\n\n🔧 Modos principales:\n• **V** → Voltaje (AC o DC)\n• **A** → Corriente\n• **Ω** → Resistencia\n\n📌 Es la herramienta básica de cualquier técnico o ingeniero eléctrico.`},
+
+  // ══ LEY DE OHM EN CA vs CD ══
+  {exact:['corriente alterna','corriente directa','diferencia ca y cd','que es ca','que es cd',
+          'que es ac','que es dc','corriente ac','corriente dc'],
+   k:['corriente alterna','corriente directa','ca y cd','ac dc'],
+   r:`**Corriente Directa (CD/DC):**\n• Fluye siempre en la misma dirección\n• Baterías, cargadores, paneles solares\n• La Ley de Ohm aplica directamente\n\n**Corriente Alterna (CA/AC):**\n• Cambia de dirección cíclicamente (60 Hz en América)\n• Lo que llega a tu casa (120 V)\n• La Ley de Ohm aplica con impedancia (Z) en lugar de R`},
+
+  // ══ FUSIBLE ══
+  {exact:['que es un fusible','fusible','para que sirve el fusible','como funciona el fusible'],
+   k:['fusible','que es fusible'],
+   r:`Un **fusible** es un componente de seguridad que **se rompe** (funde) cuando la corriente supera un valor límite.\n\n🔥 Protege el circuito de sobrecorrientes.\n\n⚡ Por Ley de Ohm: si R baja mucho → I sube → el fusible corta el circuito.\n\n💡 Ejemplo: fusibles de tu carro, breakers del cuadro eléctrico de tu casa.`},
+
+  // ══ ENERGIA ELÉCTRICA ══
+  {exact:['que es la energia electrica','energia electrica','formula de la energia electrica',
+          'como se calcula la energia','que es el kilowatt hora','kwh','kilovatio hora'],
+   k:['energia electrica','kwh','kilowatt hora','kilovatio hora'],
+   r:`**Energía eléctrica (E)** es la potencia consumida en un tiempo.\n\n💡 **E = P × t**\n\nEjemplo: un aparato de 1000 W funcionando 1 hora = **1 kWh** (kilovatio-hora)\n\nEs la unidad que te cobra la empresa de electricidad.\n\n⚡ E = V × I × t = I² × R × t`},
+
+  // ══ DIFERENCIA DE POTENCIAL ══
+  {exact:['que es la diferencia de potencial','diferencia de potencial','potencial electrico'],
+   k:['diferencia de potencial','potencial electrico'],
+   r:`La **diferencia de potencial** (o voltaje) es la "altura" eléctrica entre dos puntos.\n\n🎢 Analogía: como la diferencia de altura entre dos puntos en una rampa — el agua (corriente) fluye del punto más alto al más bajo.\n\nSe mide en **Voltios (V)** y es lo que "mueve" los electrones por el circuito.`},
+
+  // ══ RESISTOR / RESISTENCIA (componente) ══
+  {exact:['que es un resistor','resistor','que es una resistencia componente',
+          'para que sirve un resistor','colores de resistencia','como leer una resistencia'],
+   k:['resistor','componente resistencia','colores resistencia','leer resistencia'],
+   r:`Un **resistor** (o resistencia) es un componente electrónico que opone resistencia al paso de la corriente.\n\n🎨 Sus franjas de colores indican su valor en Ohmios:\n• Negro=0, Café=1, Rojo=2, Naranja=3, Amarillo=4\n• Verde=5, Azul=6, Violeta=7, Gris=8, Blanco=9\n\nUsos: limitar corriente, dividir voltaje, proteger LEDs.`},
+
+  // ══ CÓMO ESTUDIAR LA LEY DE OHM ══
+  {exact:['como estudiar la ley de ohm','como aprendo la ley de ohm','trucos para recordar ohm',
+          'como memorizo la ley de ohm','me puedes ensenar','ensenme','como aprender ohm'],
+   k:['como estudiar','como aprendo','como memorizo','trucos ohm','tip ohm'],
+   r:`**Tips para memorizar la Ley de Ohm:**\n\n🔺 **El triángulo VIR** — tapa la variable que buscas:\n• Tapa V → multiplica I × R\n• Tapa I → divide V ÷ R\n• Tapa R → divide V ÷ I\n\n💧 **La analogía del agua** — voltaje=presión, corriente=caudal, resistencia=tubería estrecha\n\n🎵 **Mnemónica:** "**V**oy a **I**r a **R**omar" → V = I × R\n\n📝 Practica con la calculadora de arriba ↑`},
+
+  // ══ CIRCUITO ABIERTO / CERRADO ══
+  {exact:['que es un circuito abierto','circuito abierto','que es un circuito cerrado','circuito cerrado'],
+   k:['circuito abierto','circuito cerrado'],
+   r:`**Circuito Cerrado:** la corriente tiene un camino completo → fluye normalmente ✅\n\n**Circuito Abierto:** hay una interrupción → no fluye corriente ❌\n\n💡 Un interruptor (switch) básicamente abre y cierra el circuito.\n\n⚡ Por Ley de Ohm: circuito abierto = R infinita → I = 0 A`},
+
+  // ══ CORTOCIRCUITO ══
+  {exact:['que es un cortocircuito','cortocircuito','como ocurre un cortocircuito'],
+   k:['cortocircuito','corto circuito'],
+   r:`Un **cortocircuito** ocurre cuando la corriente encuentra un camino de **resistencia casi cero**, evitando la carga normal.\n\n⚠️ Por Ley de Ohm: si R → 0, entonces I → ∞\n\nEso genera:\n• Calor extremo 🔥\n• Puede fundir cables\n• Activa fusibles/breakers\n• Peligro de incendio\n\n🛡️ Por eso los fusibles y breakers son esenciales.`},
+
+  // ══ BATERÍA / FUENTE ══
+  {exact:['que es una bateria','bateria','que es una pila','que es una fuente de voltaje',
+          'como funciona una bateria','que es una fuente de alimentacion'],
+   k:['que es bateria','bateria electrica','fuente de voltaje','pila electrica'],
+   r:`Una **batería** (o pila) es una fuente de energía que mantiene una diferencia de potencial (voltaje) constante entre sus terminales.\n\n⚡ Convierte energía química en eléctrica.\n\n🔋 Ejemplos:\n• Pila AA: 1.5 V\n• Batería de celular: 3.7 V\n• Batería de auto: 12 V\n• Red eléctrica: 120 V AC\n\nEs la que "empuja" los electrones por el circuito.`},
+
+  // ══ LED ══
+  {exact:['que es un led','led','como funciona un led','para que sirve una resistencia con led'],
+   k:['que es led','led electrico'],
+   r:`Un **LED** (Light Emitting Diode) es un componente que emite luz cuando pasa corriente.\n\n⚠️ Los LEDs necesitan una **resistencia limitadora** para no quemarse.\n\nCálculo de resistencia para LED:\n🔴 R = (V_fuente – V_led) ÷ I_led\n\nEjemplo: Fuente 9V, LED rojo (2V, 20mA):\nR = (9–2) / 0.02 = **350 Ω**`},
+
+  // ══ OHMS LAW EN INGLÉS ══
+  {exact:["ohm's law","ohms law","what is ohm's law","what is ohms law"],
+   k:["ohm's law","ohms law"],
+   r:`**Ohm's Law** states: V = I × R\n\n• **V** = Voltage (Volts)\n• **I** = Current (Amperes)\n• **R** = Resistance (Ohms Ω)\n\nFormulated by **Georg Simon Ohm** in 1827. It's the fundamental law of electrical circuits! ⚡`},
+
+  // ══ VECTORES ══
+  {exact:['que son los vectores','que es un vector','vectores en fisica','vectores electricos',
+          'como se ven los vectores','para que sirven los vectores','que representa un vector'],
+   k:['que son vectores','vector electrico','vectores en fisica','que representa vector'],
+   r:`En este simulador los **vectores** representan magnitudes con dirección y longitud proporcional al valor:\n\n🔵 Vector **V** — azul, proporcional al voltaje\n🟡 Vector **I** — amarillo, proporcional a la corriente\n🔴 Vector **R** — rojo, proporcional a la resistencia\n\n📐 Mientras más larga la flecha → mayor el valor.\nVélos en la sección "Visualización Vectorial" ↑`},
+
+  // ══ CUÁNTO MIDE / UNIDADES ══
+  {exact:['cuanto es un voltio','cuanto es un amperio','cuanto es un ohmio','que es un voltio',
+          'que es un amperio','que es un ohmio','unidades electricas'],
+   k:['cuanto es voltio','cuanto es amperio','cuanto es ohmio','unidades electricas'],
+   r:`**Unidades eléctricas básicas:**\n\n🔵 **1 Voltio (V)** = diferencia de potencial que produce 1 A con 1 Ω de resistencia\n🟡 **1 Amperio (A)** = 1 Coulomb de carga por segundo\n🔴 **1 Ohmio (Ω)** = resistencia que con 1 V produce 1 A\n💚 **1 Vatio (W)** = 1 Joule por segundo = 1 V × 1 A`},
+
+  // ══ CÓMO AFECTA LA TEMPERATURA ══
+  {exact:['como afecta la temperatura a la resistencia','temperatura y resistencia',
+          'que pasa con la resistencia cuando hay calor','por que cambia la resistencia con temperatura'],
+   k:['temperatura resistencia','calor resistencia','como afecta temperatura'],
+   r:`La **temperatura** afecta la resistencia:\n\n🔴 **Metales** (conductores): al calentarse → R **aumenta** (más vibraciones moleculares)\n🔵 **Semiconductores**: al calentarse → R **disminuye**\n🟡 **Aislantes**: generalmente R disminuye con temperatura\n\n💡 Por eso los cables se calientan con corriente alta — es el efecto Joule (P = I² × R).`},
+
+  // ══ EFECTO JOULE ══
+  {exact:['que es el efecto joule','efecto joule','calor de joule','por que se calientan los cables'],
+   k:['efecto joule','calor joule','cables calientan'],
+   r:`El **Efecto Joule** es la generación de calor cuando la corriente pasa por un conductor.\n\n🔥 **Q = I² × R × t**\n\nA mayor corriente o resistencia → más calor generado.\n\n💡 Aplicaciones:\n• Plancha eléctrica\n• Tostadora\n• Foco incandescente\n• Calefactor eléctrico\n\n⚠️ También causa pérdidas de energía en cables de transmisión.`},
+
+  // ══ PREGUNTAS SENCILLAS ══
+  {exact:['cuanto es 12v entre 4 ohm','cuanto es 12 entre 4','calcula 12v 4 ohm'],
+   k:['cuanto es 12v','calcula 12v 4 ohm'],
+   r:`¡Fácil! Con V = 12 V y R = 4 Ω:\n\n🟡 **I = V ÷ R = 12 ÷ 4 = 3 A**\n💚 **P = V × I = 12 × 3 = 36 W**\n\n¡Usa la calculadora de arriba para más cálculos! 🧮`},
+
+  {exact:['si aumento el voltaje que pasa','que pasa si subo el voltaje','que ocurre si sube el voltaje'],
+   k:['si aumento voltaje','si subo voltaje','que pasa si sube voltaje'],
+   r:`Si **aumentas el Voltaje** (con R constante):\n\n⬆️ V sube → **I sube proporcionalmente**\n\n📐 I = V ÷ R\nSi V se duplica → I se duplica\n\n💡 Ejemplo:\n• 6V / 2Ω = 3A\n• 12V / 2Ω = 6A ← el doble\n\n⚡ Más voltaje = más "fuerza" para mover electrones.`},
+
+  {exact:['si aumento la resistencia que pasa','que pasa si subo la resistencia','que ocurre si sube la resistencia'],
+   k:['si aumento resistencia','si subo resistencia','que pasa si sube resistencia'],
+   r:`Si **aumentas la Resistencia** (con V constante):\n\n⬆️ R sube → **I baja inversamente**\n\n📐 I = V ÷ R\nSi R se duplica → I se reduce a la mitad\n\n💡 Ejemplo:\n• 12V / 2Ω = 6A\n• 12V / 4Ω = 3A ← la mitad\n\n🪨 Más resistencia = más obstáculo para los electrones.`},
+
+  {exact:['que pasa si la resistencia es 0','que ocurre si r es 0','resistencia cero'],
+   k:['resistencia cero','r igual 0','r es 0'],
+   r:`Si **R = 0 Ω** (resistencia cero):\n\n⚡ I = V ÷ 0 = **infinito teórico**\n\n⚠️ Esto es un **cortocircuito** — en la práctica la corriente sube muchísimo y:\n• Se funden los cables\n• Se activan fusibles/breakers\n• Puede causar incendio 🔥\n\n📌 Nunca hay resistencia exactamente cero; siempre hay algo de resistencia.`},
+
+  {exact:['que pasa si la corriente es 0','que ocurre si i es 0','corriente cero','sin corriente'],
+   k:['corriente cero','i igual 0','sin corriente'],
+   r:`Si **I = 0 A** (corriente cero):\n\n🔴 El circuito está **abierto** (interrumpido)\n• Un interruptor apagado\n• Un cable cortado\n• Un fusible quemado\n\n⚡ V puede existir (la batería sigue teniendo potencial) pero no hay flujo de electrones.\n\nP = V × 0 = **0 W** → no se consume energía.`},
+
+  // ══ EQUIPO GAES ══
+  {exact:['quien hizo esto','quienes hicieron esto','el equipo','proyecto gaes','gaes',
+          'quienes son','quien lo hizo','nombre del proyecto','quienes trabajan en esto'],
+   k:['proyecto gaes','gaes','equipo','quienes son','quien hizo','nombre proyecto'],
+   r:`¡Proyecto **GAES** hecho con 💙 por:\n\n👩‍🔬 Edier Bejarano\n👩‍🔬 Karen Carrero\n👨‍🔬 Juan Zarate\n👩‍🔬 Luz Reyes\n👨‍🔬 Carlos Mendez\n\n⚡ ¡Un equipo increíble! 🎓`},
+
+  // ══ GRACIAS ══
+  {exact:['gracias','muchas gracias','thanks','thank you','gracias karen','muy bien','chevere','perfecto','excelente'],
+   k:['gracias','thanks'],
+   r:`¡Con mucho gusto! 😊 Si tienes más dudas sobre Física Eléctrica, aquí estoy. ¡Éxito en el proyecto GAES! ⚡`},
+
+  // ══ QUIEN ES KAREN ══
+  {exact:['quien eres','quien eres tu','como te llamas','que eres','que eres tu','presentate'],
+   k:['quien eres','como te llamas','presentate'],
+   r:`¡Hola! Soy **Karen** 👩‍🔬, la asistente virtual de Física Eléctrica del proyecto GAES.\n\nEstoy entrenada para responder preguntas sobre:\n⚡ Ley de Ohm\n🔌 Circuitos eléctricos\n📐 Vectores eléctricos\n🧮 Cálculos de V, I, R y P\n\n¿En qué te puedo ayudar?`},
+
+  // ══ SALUDOS ══
+  {exact:['hola','hi','hey','buenas','buenos dias','buenas tardes','buenas noches','hola karen','que tal','como estas'],
+   k:['hola','hi','hey','buenas','como estas'],
+   r:`¡Hola! 👋 Soy **Karen**, tu asistente de Física Eléctrica.\n\n¿Qué quieres aprender hoy sobre la Ley de Ohm? ⚡\n\nPuedes preguntarme sobre fórmulas, circuitos, historia, ejemplos o lo que necesites 😊`},
+
+  // ══ DESPEDIDA ══
+  {exact:['adios','chao','hasta luego','bye','nos vemos','hasta pronto'],
+   k:['adios','chao','bye','hasta luego'],
+   r:`¡Hasta luego! 👋 Fue un placer ayudarte. Recuerda: **V = I × R** 😄⚡\n\nVuelve cuando tengas más preguntas sobre Física Eléctrica.`},
 ];
 
-const QUICK=['¿Qué es la Ley de Ohm?','¿Quién fue Georg Ohm?','¿Cuáles son las fórmulas?','Ejemplos reales','¿Qué es el voltaje?','¿Qué es la corriente?','Circuito en paralelo'];
+const QUICK=[
+  '¿Qué es la Ley de Ohm?',
+  '¿Quién fue Georg Ohm?',
+  '¿Cuáles son las fórmulas?',
+  '¿Qué es el voltaje?',
+  '¿Qué es la corriente?',
+  '¿Qué es la resistencia?',
+  'Circuito serie vs paralelo',
+  'Ejemplos reales',
+  '¿Qué es el cortocircuito?',
+  'Tips para estudiar',
+];
 
 function karenReply(raw){
   const m=norm(raw);
