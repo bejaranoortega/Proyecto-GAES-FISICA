@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ley de Ohm — GAES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1A6CF6;--blue2:#4F8EFF;--amber:#F59E0B;--red:#EF4444;
+  --green:#10B981;--teal:#06B6D4;--purple:#8B5CF6;--pink:#EC4899;
+  --dark:#07091A;--dark2:#0E1525;--dark3:#162035;--dark4:#1C2A40;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#E8ECF4;--muted:#7A8BA8;
+  --glow-v:rgba(26,108,246,0.5);--glow-i:rgba(245,158,11,0.5);--glow-r:rgba(239,68,68,0.5);
+  --glow-g:rgba(16,185,129,0.4);--glow-p:rgba(139,92,246,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--dark);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 0%,rgba(26,108,246,0.07) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%,rgba(139,92,246,0.06) 0%,transparent 60%);
+}
+
+/* ── HERO ── */
+.hero{
+  position:relative;text-align:center;
+  padding:clamp(36px,8vw,64px) 20px 48px;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-100px;left:50%;
+  transform:translateX(-50%);width:min(700px,140vw);height:500px;
+  background:radial-gradient(ellipse,rgba(26,108,246,0.22) 0%,rgba(139,92,246,0.08) 40%,transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(26,108,246,0.015) 40px,rgba(26,108,246,0.015) 41px),
+             repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(26,108,246,0.015) 40px,rgba(26,108,246,0.015) 41px);
+  pointer-events:none;
+}
+.hero-label{
+  font-size:11px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--blue2);margin-bottom:16px;font-weight:500;
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(26,108,246,0.1);border:1px solid rgba(26,108,246,0.25);
+  border-radius:20px;padding:5px 16px;
+}
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,14vw,120px);
+  line-height:0.88;letter-spacing:-1px;
+  background:linear-gradient(135deg,#ffffff 0%,#a8c4ff 40%,var(--blue) 70%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;position:relative;z-index:1;
+}
+.hero-sub{
+  font-size:clamp(13px,3.5vw,16px);color:var(--muted);
+  max-width:520px;margin:0 auto 32px;line-height:1.7;padding:0 8px;
+  position:relative;z-index:1;
+}
+.formula-hero{
+  display:inline-flex;align-items:center;
+  gap:clamp(10px,3vw,20px);
+  background:linear-gradient(135deg,rgba(26,108,246,0.15),rgba(139,92,246,0.08));
+  border:1px solid rgba(26,108,246,0.35);
+  border-radius:20px;
+  padding:clamp(14px,3vw,22px) clamp(22px,5vw,44px);
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(22px,7vw,44px);font-weight:600;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 40px rgba(26,108,246,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
+  position:relative;z-index:1;
+}
+.formula-hero .v{color:#60a5fa;text-shadow:0 0 20px rgba(96,165,250,0.5);}
+.formula-hero .eq{color:var(--muted);}
+.formula-hero .i{color:#fbbf24;text-shadow:0 0 20px rgba(251,191,36,0.5);}
+.formula-hero .r{color:#f87171;text-shadow:0 0 20px rgba(248,113,113,0.5);}
+
+/* ── LAYOUT ── */
+.container{max-width:1200px;margin:0 auto;padding:0 clamp(14px,4vw,28px) 90px;}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(26px,6vw,44px);letter-spacing:1px;margin-bottom:8px;
+  background:linear-gradient(90deg,#fff 60%,var(--blue2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.section-desc{font-size:clamp(13px,3.5vw,14px);color:var(--muted);margin-bottom:22px;line-height:1.65;}
+.card{
+  background:linear-gradient(135deg,var(--dark2),var(--dark3));
+  border:1px solid var(--border2);border-radius:18px;
+  padding:clamp(16px,4vw,28px);margin-bottom:20px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(26,108,246,0.3),rgba(139,92,246,0.2),transparent);
+  margin:clamp(28px,5vw,48px) 0;
+}
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* ── INFO BOXES ── */
+.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,2vw,16px);margin-top:16px;}
+@media(max-width:480px){.info-row{grid-template-columns:1fr;gap:10px;}}
+.info-box{
+  border-radius:14px;padding:clamp(14px,3vw,20px);text-align:center;
+  position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;
+}
+.info-box:hover{transform:translateY(-3px);}
+.info-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0;
+}
+.info-box.v{background:linear-gradient(135deg,rgba(26,108,246,0.13),rgba(26,108,246,0.06));border:1px solid rgba(26,108,246,0.25);}
+.info-box.v::before{background:linear-gradient(90deg,var(--blue),var(--blue2));box-shadow:0 0 16px var(--glow-v);}
+.info-box.i{background:linear-gradient(135deg,rgba(245,158,11,0.13),rgba(245,158,11,0.06));border:1px solid rgba(245,158,11,0.25);}
+.info-box.i::before{background:linear-gradient(90deg,var(--amber),#fcd34d);box-shadow:0 0 16px var(--glow-i);}
+.info-box.r{background:linear-gradient(135deg,rgba(239,68,68,0.13),rgba(239,68,68,0.06));border:1px solid rgba(239,68,68,0.25);}
+.info-box.r::before{background:linear-gradient(90deg,var(--red),#f97316);box-shadow:0 0 16px var(--glow-r);}
+.info-box .sym{font-family:'JetBrains Mono',monospace;font-size:clamp(26px,5vw,34px);font-weight:700;}
+.info-box.v .sym{color:#60a5fa;text-shadow:0 0 16px rgba(96,165,250,0.4);}
+.info-box.i .sym{color:#fbbf24;text-shadow:0 0 16px rgba(251,191,36,0.4);}
+.info-box.r .sym{color:#f87171;text-shadow:0 0 16px rgba(248,113,113,0.4);}
+.info-box .name{font-size:clamp(13px,3vw,15px);font-weight:600;margin-top:6px;}
+.info-box .unit{font-size:clamp(10px,2.5vw,12px);color:var(--muted);margin-top:3px;}
+
+/* ── CIRCUIT ── */
+#circuitCanvas{width:100%;height:clamp(200px,45vw,320px);border-radius:12px;background:var(--dark);display:block;cursor:grab;border:1px solid var(--border);touch-action:none;}
+#circuitCanvas:active{cursor:grabbing;}
+
+/* ── PARTICLES ── */
+#particleCanvas{width:100%;height:clamp(70px,18vw,120px);display:block;border-radius:10px;border:1px solid var(--border);background:var(--dark);}
+
+/* ── CONTROLS ── */
+.controls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:clamp(10px,2vw,20px);margin-top:20px;}
+.ctrl-card{
+  background:linear-gradient(135deg,var(--dark3),var(--dark4));
+  border-radius:14px;padding:clamp(14px,3vw,20px);border:1px solid var(--border2);
+  position:relative;overflow:hidden;transition:transform .2s;
+}
+.ctrl-card:hover{transform:translateY(-2px);}
+.ctrl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0;}
+.ctrl-card.voltage::before{background:linear-gradient(90deg,var(--blue),var(--blue2));box-shadow:0 0 14px var(--glow-v);}
+.ctrl-card.current::before{background:linear-gradient(90deg,var(--amber),#fcd34d);box-shadow:0 0 14px var(--glow-i);}
+.ctrl-card.resistance::before{background:linear-gradient(90deg,var(--red),#f97316);box-shadow:0 0 14px var(--glow-r);}
+.ctrl-label{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+.ctrl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ctrl-value{font-family:'JetBrains Mono',monospace;font-size:clamp(24px,6vw,32px);font-weight:600;margin-bottom:10px;line-height:1;}
+.ctrl-value.v{color:#60a5fa;text-shadow:0 0 12px rgba(96,165,250,0.3);}
+.ctrl-value.i{color:#fbbf24;text-shadow:0 0 12px rgba(251,191,36,0.3);}
+.ctrl-value.r{color:#f87171;text-shadow:0 0 12px rgba(248,113,113,0.3);}
+input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:3px;outline:none;cursor:pointer;}
+.voltage-slider{background:linear-gradient(to right,var(--blue) 0%,var(--blue2) var(--pct,50%),#2a3a55 var(--pct,50%),#2a3a55 100%);}
+.current-slider{background:linear-gradient(to right,var(--amber) 0%,#fcd34d var(--pct,50%),#2a3a55 var(--pct,50%),#2a3a55 100%);}
+.resistance-slider{background:linear-gradient(to right,var(--red) 0%,#f97316 var(--pct,50%),#2a3a55 var(--pct,50%),#2a3a55 100%);}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,0.15);cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:none;cursor:pointer;}
+.slider-note{font-size:10px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between;}
+.computed-badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border);margin-bottom:8px;}
+
+/* ── POWER ── */
+.power-display{
+  background:linear-gradient(135deg,rgba(16,185,129,0.14),rgba(6,182,212,0.08),rgba(139,92,246,0.06));
+  border:1px solid rgba(16,185,129,0.28);border-radius:14px;
+  padding:clamp(16px,3vw,24px);text-align:center;margin-top:16px;
+  box-shadow:0 4px 24px rgba(16,185,129,0.1),inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.power-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--green);margin-bottom:4px;}
+.power-value{font-family:'JetBrains Mono',monospace;font-size:clamp(30px,8vw,46px);font-weight:700;color:var(--green);text-shadow:0 0 20px rgba(16,185,129,0.4);}
+.power-unit{font-size:13px;color:var(--muted);}
+
+/* ── VECTOR SVG ── */
+#vectorCanvas{width:100%;display:block;}
+
+/* ── TRIANGLE + ANALOGY ── */
+.tri-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,24px);align-items:start;}
+@media(max-width:600px){.tri-grid{grid-template-columns:1fr;}}
+.triangle-wrap{display:flex;justify-content:center;align-items:center;padding:16px;}
+#triangleCanvas{width:min(280px,100%);height:auto;cursor:pointer;}
+.analogy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
+.analogy-card{
+  background:linear-gradient(135deg,var(--dark3),var(--dark4));
+  border:1px solid var(--border2);border-radius:12px;padding:14px;text-align:center;
+  transition:transform .2s,border-color .2s;
+}
+.analogy-card:hover{transform:translateY(-2px);border-color:rgba(26,108,246,0.3);}
+.analogy-icon{font-size:28px;margin-bottom:8px;display:block;}
+.analogy-term{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:3px;}
+.analogy-name{font-size:13px;font-weight:600;}
+.analogy-eq{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* ── CALCULATOR ── */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,24px);align-items:start;}
+@media(max-width:640px){.calc-grid{grid-template-columns:1fr;}}
+.calc-mode-btn{
+  background:linear-gradient(135deg,var(--dark3),var(--dark4));
+  border:1px solid var(--border2);border-radius:10px;
+  padding:clamp(10px,3vw,14px) 8px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;color:var(--text);
+  transition:all .2s;text-align:center;line-height:1.2;
+}
+.calc-mode-btn.active{background:linear-gradient(135deg,rgba(26,108,246,0.18),rgba(26,108,246,0.08));border-color:rgba(26,108,246,0.45);box-shadow:0 0 12px rgba(26,108,246,0.15);}
+.calc-mode-btn:hover{border-color:rgba(255,255,255,0.2);transform:translateY(-1px);}
+.calc-input-group{display:flex;flex-direction:column;gap:6px;}
+.calc-input-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.calc-input-field{
+  background:var(--dark);border:1px solid var(--border2);border-radius:8px 0 0 8px;
+  padding:clamp(10px,3vw,12px) 14px;font-family:'JetBrains Mono',monospace;
+  font-size:clamp(16px,4vw,18px);color:var(--text);outline:none;width:100%;
+  transition:border-color .2s,box-shadow .2s;border-right:none;
+}
+.calc-input-field:focus{border-color:rgba(26,108,246,0.5);box-shadow:0 0 0 3px rgba(26,108,246,0.08);}
+.calc-input-field.v-inp:focus{border-color:rgba(96,165,250,0.6);}
+.calc-input-field.i-inp:focus{border-color:rgba(251,191,36,0.6);}
+.calc-input-field.r-inp:focus{border-color:rgba(248,113,113,0.6);}
+.calc-unit-badge{background:var(--dark);border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;padding:clamp(10px,3vw,12px) 12px;font-size:13px;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+.calc-result-box{border-radius:12px;padding:clamp(14px,3vw,18px);text-align:center;}
+.calc-result-box.v{background:linear-gradient(135deg,rgba(26,108,246,0.14),rgba(26,108,246,0.06));border:1px solid rgba(26,108,246,0.35);}
+.calc-result-box.i{background:linear-gradient(135deg,rgba(245,158,11,0.14),rgba(245,158,11,0.06));border:1px solid rgba(245,158,11,0.35);}
+.calc-result-box.r{background:linear-gradient(135deg,rgba(239,68,68,0.14),rgba(239,68,68,0.06));border:1px solid rgba(239,68,68,0.35);}
+.calc-result-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;}
+.calc-result-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,10vw,52px);line-height:1;}
+.calc-result-unit{font-size:13px;color:var(--muted);margin-top:2px;}
+.calc-result-box.v .calc-result-label,.calc-result-box.v .calc-result-num{color:#60a5fa;}
+.calc-result-box.i .calc-result-label,.calc-result-box.i .calc-result-num{color:#fbbf24;}
+.calc-result-box.r .calc-result-label,.calc-result-box.r .calc-result-num{color:#f87171;}
+
+/* ── KAREN CHAT ── */
+#karenWidget{position:fixed;bottom:clamp(16px,4vw,24px);right:clamp(16px,4vw,24px);z-index:9000;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:'Space Grotesk',sans-serif;}
+#karenToggle{width:62px;height:62px;border-radius:50%;border:2px solid rgba(26,108,246,0.5);background:var(--dark2);box-shadow:0 0 0 4px rgba(26,108,246,0.12),0 8px 28px rgba(0,0,0,0.5);cursor:pointer;overflow:hidden;position:relative;padding:0;transition:transform .2s,box-shadow .2s;flex-shrink:0;}
+#karenToggle:hover{transform:scale(1.08);box-shadow:0 0 0 6px rgba(26,108,246,0.22),0 12px 36px rgba(0,0,0,0.6);}
+#karenToggle img{width:100%;height:100%;object-fit:cover;display:block;}
+.karen-toggle-fb{width:100%;height:100%;background:linear-gradient(135deg,#1A6CF6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-family:'Bebas Neue',sans-serif;}
+.karen-badge{position:absolute;top:-2px;right:-2px;width:15px;height:15px;background:var(--green);border-radius:50%;border:2px solid var(--dark);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.5);}50%{box-shadow:0 0 0 6px rgba(16,185,129,0);}}
+#karenChat{width:clamp(290px,90vw,360px);background:linear-gradient(160deg,var(--dark2),var(--dark3));border:1px solid rgba(26,108,246,0.28);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.03);display:flex;flex-direction:column;overflow:hidden;transition:opacity .3s,transform .3s;max-height:min(520px,80vh);}
+#karenChat.hidden{opacity:0;transform:translateY(14px) scale(0.97);pointer-events:none;}
+.karen-header{background:linear-gradient(135deg,rgba(26,108,246,0.22),rgba(139,92,246,0.1));border-bottom:1px solid rgba(255,255,255,0.06);padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.karen-avatar-sm{width:40px;height:40px;border-radius:50%;border:2px solid rgba(26,108,246,0.5);overflow:hidden;flex-shrink:0;box-shadow:0 0 0 3px rgba(26,108,246,0.1);}
+.karen-avatar-sm img{width:100%;height:100%;object-fit:cover;}
+.karen-av-fb{width:100%;height:100%;background:linear-gradient(135deg,#1A6CF6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-family:'Bebas Neue',sans-serif;}
+.karen-info{flex:1;min-width:0;}
+.karen-name{font-size:14px;font-weight:600;color:var(--text);}
+.karen-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;}
+.karen-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;box-shadow:0 0 6px var(--green);}
+.karen-collapse-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px 6px;border-radius:6px;transition:color .2s,background .2s;line-height:1;flex-shrink:0;}
+.karen-collapse-btn:hover{color:var(--text);background:rgba(255,255,255,0.06);}
+#karenMessages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;}
+#karenMessages::-webkit-scrollbar{width:3px;}
+#karenMessages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+.k-msg{display:flex;gap:7px;align-items:flex-end;animation:msgIn .22s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+.k-msg.user{flex-direction:row-reverse;}
+.k-bubble{max-width:80%;padding:9px 13px;border-radius:16px;font-size:13px;line-height:1.55;word-break:break-word;}
+.k-msg.karen .k-bubble{background:var(--dark3);border:1px solid rgba(26,108,246,0.15);color:var(--text);border-radius:4px 16px 16px 16px;}
+.k-msg.user .k-bubble{background:linear-gradient(135deg,rgba(26,108,246,0.35),rgba(139,92,246,0.2));border:1px solid rgba(26,108,246,0.35);color:var(--text);border-radius:16px 16px 4px 16px;}
+.k-av{width:26px;height:26px;border-radius:50%;overflow:hidden;border:1px solid rgba(26,108,246,0.35);flex-shrink:0;}
+.k-av img{width:100%;height:100%;object-fit:cover;}
+.k-av-fb{width:100%;height:100%;background:linear-gradient(135deg,#1A6CF6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-family:'Bebas Neue',sans-serif;}
+.k-typing{display:flex;gap:4px;align-items:center;padding:10px 13px;background:var(--dark3);border-radius:4px 16px 16px 16px;border:1px solid rgba(26,108,246,0.12);width:fit-content;}
+.k-typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:dot 1.2s infinite;}
+.k-typing span:nth-child(2){animation-delay:.2s;}.k-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-5px);opacity:1;}}
+.k-quick-wrap{padding:0 12px 10px;display:flex;flex-wrap:wrap;gap:5px;}
+.k-quick{font-size:11px;padding:5px 10px;border-radius:20px;border:1px solid rgba(26,108,246,0.3);background:rgba(26,108,246,0.08);color:var(--blue2);cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif;white-space:nowrap;}
+.k-quick:hover{background:rgba(26,108,246,0.2);border-color:rgba(26,108,246,0.5);transform:translateY(-1px);}
+.k-quick:active{transform:scale(0.96);}
+.karen-input-area{border-top:1px solid rgba(255,255,255,0.06);padding:10px 12px;display:flex;gap:8px;align-items:flex-end;background:var(--dark2);}
+#karenInput{flex:1;background:var(--dark);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13px;color:var(--text);outline:none;resize:none;min-height:38px;max-height:90px;font-family:'Space Grotesk',sans-serif;transition:border-color .2s,box-shadow .2s;line-height:1.4;}
+#karenInput:focus{border-color:rgba(26,108,246,0.45);box-shadow:0 0 0 3px rgba(26,108,246,0.08);}
+#karenInput::placeholder{color:var(--muted);}
+#karenSend{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .2s,transform .15s;box-shadow:0 4px 14px rgba(26,108,246,0.4);}
+#karenSend:hover{opacity:.88;transform:scale(1.06);}
+#karenSend:active{transform:scale(0.96);}
+#karenSend svg{width:15px;height:15px;fill:#fff;}
+
+/* ── MUSIC PLAYER ── */
+#musicPlayer{
+  position:fixed;bottom:clamp(16px,4vw,24px);left:clamp(16px,4vw,24px);
+  z-index:9000;display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(14,21,37,0.95),rgba(22,32,53,0.95));
+  border:1px solid rgba(139,92,246,0.3);border-radius:16px;
+  padding:10px 16px;backdrop-filter:blur(16px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04);
+  transition:opacity .3s;min-width:0;
+}
+#musicPlayer:hover{border-color:rgba(139,92,246,0.5);}
+.mp-icon{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 3px rgba(139,92,246,0.2);cursor:pointer;
+  transition:transform .2s,box-shadow .2s;border:none;
+}
+.mp-icon:hover{transform:scale(1.1);box-shadow:0 0 0 4px rgba(139,92,246,0.3);}
+.mp-icon svg{width:16px;height:16px;fill:#fff;}
+.mp-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.mp-title{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;}
+.mp-sub{font-size:10px;color:var(--muted);}
+.mp-bars{display:flex;align-items:flex-end;gap:2px;height:16px;}
+.mp-bar{width:3px;border-radius:2px;background:var(--purple);animation:mpBar 1s ease-in-out infinite;}
+.mp-bar:nth-child(1){height:6px;animation-delay:0s;}
+.mp-bar:nth-child(2){height:14px;animation-delay:.1s;}
+.mp-bar:nth-child(3){height:9px;animation-delay:.2s;}
+.mp-bar:nth-child(4){height:14px;animation-delay:.15s;}
+.mp-bar:nth-child(5){height:6px;animation-delay:.05s;}
+.mp-bars.paused .mp-bar{animation-play-state:paused;}
+@keyframes mpBar{0%,100%{transform:scaleY(0.4);}50%{transform:scaleY(1);}}
+.mp-vol{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.mp-vol-icon{color:var(--muted);font-size:13px;cursor:default;line-height:1;}
+#volSlider{
+  -webkit-appearance:none;width:60px;height:3px;border-radius:2px;outline:none;cursor:pointer;
+  background:linear-gradient(to right,var(--purple) 0%,var(--purple) var(--vpct,70%),#2a3a55 var(--vpct,70%),#2a3a55 100%);
+}
+#volSlider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 0 0 2px rgba(139,92,246,0.4);}
+#volSlider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:none;cursor:pointer;}
+@media(max-width:400px){.mp-title{max-width:70px;}.mp-vol{display:none;}}
+
+/* ── VIDEO OVERLAY ── */
+#videoOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .45s ease;backdrop-filter:blur(8px);}
+#videoOverlay.show{opacity:1;pointer-events:all;}
+#videoBox{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.85);transform:scale(0.9);transition:transform .5s cubic-bezier(.16,1,.3,1);}
+#videoOverlay.show #videoBox{transform:scale(1);}
+#videoBox video{display:block;max-width:88vw;max-height:82vh;width:auto;height:auto;outline:none;}
+#videoCloseBtn{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.18);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:2;backdrop-filter:blur(4px);}
+#videoCloseBtn:hover{background:rgba(239,68,68,0.7);}
+
+/* ── MOBILE ── */
+@media(max-width:480px){
+  .hero{padding:28px 16px 28px;}
+  #karenChat{width:calc(100vw - 28px);max-height:72vh;}
+  #karenWidget{right:14px;bottom:14px;}
+  .k-quick{font-size:10px;padding:4px 8px;}
+  .ctrl-value{font-size:26px;}
+  .power-value{font-size:30px;}
+  #musicPlayer{padding:8px 12px;gap:8px;}
+}
+@media(max-width:360px){.hero-title{font-size:44px;}}
+</style>
+</head>
+<body>
+
+<!-- MÚSICA DE FONDO -->
+<audio id="bgMusic" loop>
+  <source src="musicafondo.mp3" type="audio/mpeg">
+</audio>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">⚡ Proyecto GAES</div>
+  <h1 class="hero-title">LEY DE OHM</h1>
+  <p class="hero-sub">Explora la relación fundamental entre voltaje, corriente y resistencia con simulaciones en tiempo real</p>
+  <div class="formula-hero">
+    <span class="v">V</span><span class="eq">=</span><span class="i">I</span>
+    <span style="color:var(--muted)">×</span><span class="r">R</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="info-row fade-in">
+    <div class="info-box v"><div class="sym">V</div><div class="name">Voltaje</div><div class="unit">Voltios · Potencial</div></div>
+    <div class="info-box i"><div class="sym">I</div><div class="name">Corriente</div><div class="unit">Amperios · Flujo</div></div>
+    <div class="info-box r"><div class="sym">R</div><div class="name">Resistencia</div><div class="unit">Ohmios · Oposición</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="fade-in">
+    <div class="section-title">🔬 Simulador Interactivo</div>
+    <p class="section-desc">Ajusta voltaje y resistencia — la corriente se calcula automáticamente en tiempo real.</p>
+    <div class="card" style="padding:14px 14px 18px;">
+      <canvas id="circuitCanvas"></canvas>
+      <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;">🖱 Arrastra para rotar · toca en móvil</p>
+    </div>
+    <canvas id="particleCanvas"></canvas>
+    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:5px;margin-bottom:16px;">⚡ Velocidad de electrones proporcional a la corriente</p>
+    <div class="controls-grid">
+      <div class="ctrl-card voltage">
+        <div class="ctrl-label"><span class="ctrl-dot" style="background:#60a5fa;box-shadow:0 0 8px rgba(96,165,250,0.6)"></span>Voltaje</div>
+        <div class="ctrl-value v" id="vDisplay">12.0 V</div>
+        <div class="computed-badge">Variable</div>
+        <input type="range" id="vSlider" class="voltage-slider" min="1" max="24" value="12" step="0.5">
+        <div class="slider-note"><span>1 V</span><span>24 V</span></div>
+      </div>
+      <div class="ctrl-card resistance">
+        <div class="ctrl-label"><span class="ctrl-dot" style="background:#f87171;box-shadow:0 0 8px rgba(248,113,113,0.6)"></span>Resistencia</div>
+        <div class="ctrl-value r" id="rDisplay">4.0 Ω</div>
+        <div class="computed-badge">Variable</div>
+        <input type="range" id="rSlider" class="resistance-slider" min="1" max="20" value="4" step="0.5">
+        <div class="slider-note"><span>1 Ω</span><span>20 Ω</span></div>
+      </div>
+      <div class="ctrl-card current">
+        <div class="ctrl-label"><span class="ctrl-dot" style="background:#fbbf24;box-shadow:0 0 8px rgba(251,191,36,0.6)"></span>Corriente</div>
+        <div class="ctrl-value i" id="iDisplay">3.00 A</div>
+        <div class="computed-badge" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;">Calculada: I = V ÷ R</div>
+        <div style="height:5px;background:var(--dark2);border-radius:3px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3);">
+          <div id="iBar" style="height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:3px;transition:width .3s;width:50%;box-shadow:0 0 8px rgba(251,191,36,0.4)"></div>
+        </div>
+        <div class="slider-note"><span>0 A</span><span>24 A</span></div>
+      </div>
+    </div>
+    <div class="power-display">
+      <div class="power-label">⚡ Potencia — P = V × I</div>
+      <div class="power-value" id="pDisplay">36.00</div>
+      <div class="power-unit">Vatios (W)</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="fade-in">
+    <div class="section-title">📐 Visualización Vectorial</div>
+    <p class="section-desc">Cada flecha es proporcional al valor de la variable. Cambia los sliders y observa cómo varían.</p>
+    <div class="card">
+      <svg id="vectorCanvas" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="fade-in">
+    <div class="section-title">🔺 Triángulo de Ohm</div>
+    <p class="section-desc">Toca V, I o R para ver cómo despejar cada variable de la ecuación.</p>
+    <div class="tri-grid">
+      <div class="card">
+        <div class="triangle-wrap">
+          <canvas id="triangleCanvas" width="280" height="240"></canvas>
+        </div>
+        <div id="formulaShow" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:clamp(16px,5vw,22px);color:var(--text);padding:8px 0;">V = I × R</div>
+        <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px;">Toca V, I o R</p>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Analogía Hidráulica</div>
+        <div class="analogy-grid">
+          <div class="analogy-card"><span class="analogy-icon">💧</span><div class="analogy-term">Voltaje</div><div class="analogy-name" style="color:#60a5fa;">Presión</div><div class="analogy-eq">V (V)</div></div>
+          <div class="analogy-card"><span class="analogy-icon">🌊</span><div class="analogy-term">Corriente</div><div class="analogy-name" style="color:#fbbf24;">Caudal</div><div class="analogy-eq">I (A)</div></div>
+          <div class="analogy-card"><span class="analogy-icon">🪨</span><div class="analogy-term">Resistencia</div><div class="analogy-name" style="color:#f87171;">Tubería</div><div class="analogy-eq">R (Ω)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="fade-in">
+    <div class="section-title">📊 Gráfica V–I</div>
+    <p class="section-desc">Relación lineal entre voltaje y corriente. La pendiente de la recta es la resistencia R.</p>
+    <div class="card" style="padding:14px;">
+      <canvas id="graphCanvas" width="700" height="260" style="width:100%;height:auto;border-radius:8px;"></canvas>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="fade-in">
+    <div class="section-title">🧮 Calculadora de Ohm</div>
+    <p class="section-desc">Elige qué calcular, ingresa dos valores y obtén el tercero con pasos detallados.</p>
+    <div class="calc-grid" id="calcGrid">
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;">
+          <button class="calc-mode-btn active" onclick="setCalcMode('I',this)"><span style="font-size:18px;display:block;margin-bottom:3px;color:#fbbf24;">I</span><span style="font-size:10px;color:var(--muted)">Calcular<br>Corriente</span></button>
+          <button class="calc-mode-btn" onclick="setCalcMode('V',this)"><span style="font-size:18px;display:block;margin-bottom:3px;color:#60a5fa;">V</span><span style="font-size:10px;color:var(--muted)">Calcular<br>Voltaje</span></button>
+          <button class="calc-mode-btn" onclick="setCalcMode('R',this)"><span style="font-size:18px;display:block;margin-bottom:3px;color:#f87171;">R</span><span style="font-size:10px;color:var(--muted)">Calcular<br>Resistencia</span></button>
+        </div>
+        <div id="calcHint" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:clamp(14px,4vw,18px);color:#fbbf24;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.22);border-radius:10px;padding:11px 14px;margin-bottom:18px;">I = V ÷ R</div>
+        <div id="calcInputs" style="display:flex;flex-direction:column;gap:14px;margin-bottom:18px;"></div>
+        <button onclick="calcOhm()" style="width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,rgba(26,108,246,0.3),rgba(139,92,246,0.2));border:1px solid rgba(26,108,246,0.45);color:#60a5fa;font-size:14px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;box-shadow:0 4px 14px rgba(26,108,246,0.15);">⚡ Calcular</button>
+        <div id="calcResult" style="display:none;margin-top:16px;"></div>
+        <div id="calcSteps" style="display:none;margin-top:12px;background:var(--dark);border-radius:10px;padding:14px;border:1px solid var(--border2);">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;">Paso a paso</div>
+          <div id="calcStepsContent" style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:14px;">Representación Vectorial</div>
+        <svg id="calcVectorSVG" viewBox="0 0 320 280" style="width:100%;height:auto;"></svg>
+        <div id="calcVectorLegend" style="margin-top:10px;display:flex;flex-direction:column;gap:7px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <p style="text-align:center;font-size:11px;color:var(--muted);line-height:1.9;">
+    ⚡ Ley de Ohm · Física Eléctrica · Proyecto GAES<br>
+    <span style="color:rgba(139,92,246,0.6)">✦</span>
+    Edier Bejarano · Karen Carrero · Juan Zarate · Luz Reyes · Carlos Mendez
+    <span style="color:rgba(139,92,246,0.6)">✦</span>
+  </p>
+</div>
+
+<!-- MUSIC PLAYER -->
+<div id="musicPlayer">
+  <button class="mp-icon" id="mpBtn" onclick="toggleMusic()">
+    <svg id="mpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="mpPauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+  <div class="mp-info">
+    <div class="mp-title">Música de Fondo</div>
+    <div class="mp-sub">GAES · Ley de Ohm</div>
+  </div>
+  <div class="mp-bars paused" id="mpBars">
+    <div class="mp-bar"></div><div class="mp-bar"></div><div class="mp-bar"></div>
+    <div class="mp-bar"></div><div class="mp-bar"></div>
+  </div>
+  <div class="mp-vol">
+    <span class="mp-vol-icon">🔊</span>
+    <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.5" oninput="setVol(this.value)">
+  </div>
+</div>
+
+<!-- KAREN WIDGET -->
+<div id="karenWidget">
+  <div id="karenChat" class="hidden">
+    <div class="karen-header">
+      <div class="karen-avatar-sm">
+        <img src="karen.jpeg" alt="Karen" onerror="this.parentElement.innerHTML='<div class=\'karen-av-fb\'>K</div>'">
+      </div>
+      <div class="karen-info">
+        <div class="karen-name">Karen IA</div>
+        <div class="karen-status">En línea · Experta en Física</div>
+      </div>
+      <button class="karen-collapse-btn" id="collapseBtn" onclick="toggleChat()">▼</button>
+    </div>
+    <div id="karenMessages"></div>
+    <div class="k-quick-wrap" id="karenQuicks"></div>
+    <div class="karen-input-area">
+      <textarea id="karenInput" placeholder="Pregúntale a Karen…" rows="1"></textarea>
+      <button id="karenSend" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
+  <button id="karenToggle" onclick="toggleChat()">
+    <img src="karen.jpeg" alt="Karen" onerror="this.outerHTML='<button id=\'karenToggle\' onclick=\'toggleChat()\'><div class=\'karen-toggle-fb\'>K</div><span class=\'karen-badge\'></span></button>'">
+    <span class="karen-badge"></span>
+  </button>
+</div>
+
+<!-- VIDEO SECRETO -->
+<div id="videoOverlay" onclick="closeVideo(event)">
+  <div id="videoBox">
+    <button id="videoCloseBtn" onclick="closeVideo(null,true)">✕</button>
+    <video id="videoEl" playsinline></video>
+  </div>
+</div>
+
+<script>
+// ── SIMULATOR ────────────────────────────────────────────────
+let V=12,R=4;
+const getI=()=>V/R,getP=()=>V*getI();
+function update(){
+  const I=getI(),P=getP();
+  document.getElementById('vDisplay').textContent=V.toFixed(1)+' V';
+  document.getElementById('rDisplay').textContent=R.toFixed(1)+' Ω';
+  document.getElementById('iDisplay').textContent=I.toFixed(2)+' A';
+  document.getElementById('pDisplay').textContent=P.toFixed(2);
+  document.getElementById('iBar').style.width=Math.min(100,(I/24)*100)+'%';
+  setFill('vSlider',V,1,24);setFill('rSlider',R,1,20);
+  drawVectors();drawGraph();
+}
+function setFill(id,val,min,max){
+  document.getElementById(id).style.setProperty('--pct',((val-min)/(max-min)*100).toFixed(1)+'%');
+}
+document.getElementById('vSlider').addEventListener('input',e=>{V=+e.target.value;update();});
+document.getElementById('rSlider').addEventListener('input',e=>{R=+e.target.value;update();});
+
+// ── VECTORS ──────────────────────────────────────────────────
+function drawVectors(){
+  const svg=document.getElementById('vectorCanvas');
+  const I=getI(),W=700,H=220,mg=60,av=W-mg*2;
+  const rows=[
+    {y:55,len:(V/24)*(av*.85),color:'#60a5fa',glow:'rgba(96,165,250,0.5)',label:`V = ${V.toFixed(1)} V`,sym:'V'},
+    {y:115,len:(I/24)*(av*.85),color:'#fbbf24',glow:'rgba(251,191,36,0.5)',label:`I = ${I.toFixed(2)} A`,sym:'I'},
+    {y:175,len:(R/20)*(av*.85),color:'#f87171',glow:'rgba(248,113,113,0.5)',label:`R = ${R.toFixed(1)} Ω`,sym:'R'},
+  ];
+  svg.innerHTML=`<defs>
+    ${rows.map((r,i)=>`
+      <marker id="a${i}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+        <path d="M1 1L9 5L1 9Z" fill="${r.color}"/></marker>
+      <filter id="g${i}">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>`).join('')}
+  </defs>
+  ${[0,1,2,3,4].map(t=>`<line x1="${mg+av*t/4}" y1="20" x2="${mg+av*t/4}" y2="${H-20}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`).join('')}
+  ${[0,25,50,75,100].map(p=>`<text x="${mg+av*p/100}" y="${H-6}" text-anchor="middle" fill="rgba(255,255,255,0.18)" font-size="10" font-family="JetBrains Mono,monospace">${p}%</text>`).join('')}
+  ${rows.map((r,i)=>`
+    <text x="${mg-8}" y="${r.y+5}" text-anchor="end" fill="${r.color}" font-size="15" font-weight="700" font-family="JetBrains Mono,monospace">${r.sym}</text>
+    <line x1="${mg}" y1="${r.y}" x2="${mg+Math.max(r.len,14)}" y2="${r.y}" stroke="${r.color}" stroke-width="4" stroke-linecap="round" marker-end="url(#a${i})" filter="url(#g${i})"/>
+    <text x="${mg+r.len+18}" y="${r.y+5}" fill="${r.color}" font-size="13" font-family="JetBrains Mono,monospace" font-weight="600">${r.label}</text>
+    <line x1="${mg}" y1="${r.y}" x2="${mg+av}" y2="${r.y}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4 4"/>`).join('')}`;
+}
+
+// ── GRAPH ────────────────────────────────────────────────────
+function drawGraph(){
+  const cv=document.getElementById('graphCanvas');
+  const ctx=cv.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  cv.width=700*dpr;cv.height=260*dpr;ctx.scale(dpr,dpr);
+  const W=700,H=260,p={t:20,r:30,b:50,l:60};
+  const w=W-p.l-p.r,h=H-p.t-p.b;
+  ctx.clearRect(0,0,W,H);
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#07091A');g.addColorStop(1,'#0E1525');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const y=p.t+(h/5)*i;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(p.l+w,y);ctx.stroke();}
+  for(let i=0;i<=6;i++){const x=p.l+(w/6)*i;ctx.beginPath();ctx.moveTo(x,p.t);ctx.lineTo(x,p.t+h);ctx.stroke();}
+  ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(p.l,p.t);ctx.lineTo(p.l,p.t+h);ctx.lineTo(p.l+w,p.t+h);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='11px JetBrains Mono,monospace';ctx.textAlign='center';
+  for(let i=0;i<=6;i++)ctx.fillText(i*4+'V',p.l+(w/6)*i,p.t+h+18);
+  ctx.textAlign='right';
+  for(let i=0;i<=5;i++)ctx.fillText((5-i)*5+'A',p.l-8,p.t+(h/5)*i+4);
+  ctx.save();ctx.translate(14,p.t+h/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';
+  ctx.fillStyle='rgba(251,191,36,0.65)';ctx.font='12px Space Grotesk,sans-serif';ctx.fillText('Corriente I (A)',0,0);ctx.restore();
+  ctx.textAlign='center';ctx.fillStyle='rgba(96,165,250,0.65)';ctx.font='12px Space Grotesk,sans-serif';ctx.fillText('Voltaje V (V)',p.l+w/2,H-6);
+  [[2,'rgba(248,113,113,0.12)'],[6,'rgba(248,113,113,0.2)'],[12,'rgba(248,113,113,0.12)']].forEach(([rv,rc])=>{
+    ctx.strokeStyle=rc;ctx.lineWidth=1;ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(p.l,p.t+h);
+    const ex=p.l+(24/24)*w,ey=p.t+h-(24/rv/25)*h;
+    ctx.lineTo(ex,Math.max(p.t,ey));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=rc.replace('0.12','0.35').replace('0.2','0.5');
+    ctx.font='10px JetBrains Mono';ctx.textAlign='left';
+    ctx.fillText('R='+rv+'Ω',Math.min(p.l+w-40,ex+4),Math.max(p.t+14,ey-5));
+  });
+  // Gradient fill under current R line
+  const I=getI(),px2=p.l+(24/24)*w,py2=p.t+h-(24/R/25)*h;
+  const fill=ctx.createLinearGradient(p.l,0,px2,0);
+  fill.addColorStop(0,'rgba(248,113,113,0.06)');fill.addColorStop(1,'rgba(248,113,113,0.01)');
+  ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(p.l,p.t+h);
+  for(let v=0;v<=24;v+=0.5){const ci=v/R,x=p.l+(v/24)*w,y=p.t+h-(ci/25)*h;if(y>=p.t)ctx.lineTo(x,y);}
+  ctx.lineTo(p.l+(24/24)*w,p.t+h);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#f87171';ctx.lineWidth=2.5;
+  ctx.shadowColor='rgba(248,113,113,0.6)';ctx.shadowBlur=10;
+  ctx.beginPath();ctx.moveTo(p.l,p.t+h);
+  for(let v=0;v<=24;v+=0.5){const ci=v/R,x=p.l+(v/24)*w,y=p.t+h-(ci/25)*h;if(y>=p.t)ctx.lineTo(x,y);}
+  ctx.stroke();ctx.shadowBlur=0;
+  const px=p.l+(V/24)*w,py=p.t+h-(I/25)*h;
+  ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=2;ctx.fillStyle='#f87171';
+  ctx.shadowColor='#f87171';ctx.shadowBlur=12;
+  ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,0.9)';ctx.font='bold 11px JetBrains Mono,monospace';ctx.textAlign='left';
+  ctx.fillText(`(${V.toFixed(1)}V, ${I.toFixed(2)}A)`,px+10,py-8);
+  ctx.fillStyle='rgba(248,113,113,0.85)';ctx.font='bold 12px Space Grotesk,sans-serif';ctx.textAlign='right';
+  ctx.fillText(`R = ${R.toFixed(1)} Ω`,p.l+w-4,p.t+14);
+}
+
+// ── TRIANGLE ─────────────────────────────────────────────────
+const triCv=document.getElementById('triangleCanvas');
+const triCtx=triCv.getContext('2d');
+let selVar='V';
+function drawTri(hl){
+  const ctx=triCtx,W=280,H=240;ctx.clearRect(0,0,W,H);
+  ctx.beginPath();ctx.moveTo(140,30);ctx.lineTo(250,200);ctx.lineTo(30,200);ctx.closePath();
+  ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=2;ctx.stroke();
+  const gBg=ctx.createLinearGradient(140,30,140,200);
+  gBg.addColorStop(0,'rgba(26,108,246,0.08)');gBg.addColorStop(1,'rgba(139,92,246,0.04)');
+  ctx.fillStyle=gBg;ctx.fill();
+  ctx.beginPath();ctx.moveTo(30,115);ctx.lineTo(250,115);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=1.5;ctx.stroke();
+  const reg={V:{x:140,y:118,c:'#60a5fa'},I:{x:80,y:173,c:'#fbbf24'},R:{x:200,y:173,c:'#f87171'}};
+  Object.entries(reg).forEach(([k,r])=>{
+    const on=k===hl;
+    ctx.font=on?'bold 36px Bebas Neue,sans-serif':'28px Bebas Neue,sans-serif';
+    ctx.fillStyle=on?r.c:r.c+'77';ctx.textAlign='center';ctx.textBaseline='middle';
+    if(on){ctx.shadowColor=r.c;ctx.shadowBlur=24;}
+    ctx.fillText(k,r.x,r.y);ctx.shadowBlur=0;
+  });
+}
+triCv.addEventListener('click',e=>{
+  const rc=triCv.getBoundingClientRect();
+  const x=(e.clientX-rc.left)*(280/rc.width),y=(e.clientY-rc.top)*(240/rc.height);
+  selVar=y<125?'V':x<150?'I':'R';
+  drawTri(selVar);
+  const fs=document.getElementById('formulaShow');
+  fs.textContent={V:'V = I × R',I:'I = V / R',R:'R = V / I'}[selVar];
+  fs.style.color={V:'#60a5fa',I:'#fbbf24',R:'#f87171'}[selVar];
+});
+drawTri('V');
+
+// ── 3D CIRCUIT ───────────────────────────────────────────────
+const c3d=document.getElementById('circuitCanvas');
+const c3ctx=c3d.getContext('2d');
+let rot={x:.3,y:.5},drag=false,lm={},pts3d=[];
+function resC3(){const dpr=window.devicePixelRatio||1;c3d.width=c3d.offsetWidth*dpr;c3d.height=c3d.offsetHeight*dpr;c3ctx.scale(dpr,dpr);}
+resC3();window.addEventListener('resize',resC3);
+c3d.addEventListener('mousedown',e=>{drag=true;lm={x:e.clientX,y:e.clientY};});
+c3d.addEventListener('touchstart',e=>{drag=true;const t=e.touches[0];lm={x:t.clientX,y:t.clientY};},{passive:true});
+window.addEventListener('mouseup',()=>drag=false);window.addEventListener('touchend',()=>drag=false);
+c3d.addEventListener('mousemove',e=>{if(!drag)return;rot.y+=(e.clientX-lm.x)*.01;rot.x+=(e.clientY-lm.y)*.01;lm={x:e.clientX,y:e.clientY};});
+c3d.addEventListener('touchmove',e=>{if(!drag)return;const t=e.touches[0];rot.y+=(t.clientX-lm.x)*.01;rot.x+=(t.clientY-lm.y)*.01;lm={x:t.clientX,y:t.clientY};},{passive:true});
+function proj(x,y,z){
+  const cx=Math.cos(rot.x),sx=Math.sin(rot.x),cy=Math.cos(rot.y),sy=Math.sin(rot.y);
+  let nx=x*cy-z*sy,ny=x*sx*sy+y*cx+z*sx*cy,nz=x*cx*sy-y*sx+z*cx*cy;
+  const d=500/(500+nz+300),W=c3d.offsetWidth,H=c3d.offsetHeight;
+  return{x:W/2+nx*d*140,y:H/2-ny*d*140,d};
+}
+function draw3D(){
+  const ctx=c3ctx,W=c3d.offsetWidth,H=c3d.offsetHeight;
+  ctx.clearRect(0,0,W*2,H*2);
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#07091A');bg.addColorStop(1,'#0E1525');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W*2,H*2);
+  const I=getI(),wg=Math.min(1,I/12);
+  const nd=[[-1.2,0,1],[1.2,0,1],[1.2,0,-1],[-1.2,0,-1]];
+  const ed=[[0,1,'top'],[1,2,'right'],[2,3,'bottom'],[3,0,'left']];
+  const pj=nd.map(n=>proj(...n));
+  ed.forEach(([a,b,t])=>{
+    const pa=pj[a],pb=pj[b];ctx.save();ctx.globalAlpha=.6+(pa.d+pb.d)/2*.3;
+    if(t==='top'){ctx.strokeStyle=`rgba(96,165,250,${.6+wg*.4})`;ctx.shadowColor='#60a5fa';ctx.shadowBlur=10+wg*18;ctx.lineWidth=3+wg*2;}
+    else if(t==='bottom'){ctx.strokeStyle='rgba(100,110,140,0.5)';ctx.lineWidth=2;}
+    else if(t==='right'){ctx.strokeStyle='#f87171';ctx.shadowColor='#f87171';ctx.shadowBlur=12;ctx.lineWidth=3;}
+    else{ctx.strokeStyle='#fbbf24';ctx.shadowColor='#fbbf24';ctx.shadowBlur=12;ctx.lineWidth=3;}
+    ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.stroke();ctx.restore();
+  });
+  const b0=pj[3],b3=pj[0],bx=(b0.x+b3.x)/2,by=(b0.y+b3.y)/2,bs=22*(b0.d+b3.d)/2;
+  ctx.save();ctx.fillStyle='#162035';ctx.strokeStyle='#fbbf24';ctx.lineWidth=2;ctx.shadowColor='#fbbf24';ctx.shadowBlur=16;
+  ctx.beginPath();ctx.roundRect(bx-bs/2,by-bs*.8,bs,bs*1.6,6);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  ctx.fillStyle='#fbbf24';ctx.font=`bold ${12*bs/22}px JetBrains Mono`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(V.toFixed(1)+'V',bx,by);ctx.restore();
+  const r1=pj[1],r2=pj[2],rx=(r1.x+r2.x)/2,ry=(r1.y+r2.y)/2,rs=18*(r1.d+r2.d)/2;
+  ctx.save();ctx.fillStyle='#162035';ctx.strokeStyle='#f87171';ctx.lineWidth=2;ctx.shadowColor='#f87171';ctx.shadowBlur=14;
+  ctx.beginPath();ctx.roundRect(rx-rs*1.4,ry-rs*.6,rs*2.8,rs*1.2,4);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  ctx.fillStyle='#f87171';ctx.font=`bold ${11*rs/18}px JetBrains Mono`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(R.toFixed(1)+'Ω',rx,ry);ctx.restore();
+  const t0=pj[0],t1=pj[1];ctx.save();ctx.fillStyle='#60a5fa';ctx.font='bold 12px Space Grotesk,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='bottom';ctx.shadowColor='#60a5fa';ctx.shadowBlur=10;
+  ctx.fillText('I = '+getI().toFixed(2)+' A →',(t0.x+t1.x)/2,(t0.y+t1.y)/2-18);ctx.restore();
+}
+
+// ── PARTICLES ────────────────────────────────────────────────
+const pCv=document.getElementById('particleCanvas');
+const pCtx=pCv.getContext('2d');
+function resP(){const dpr=window.devicePixelRatio||1;pCv.width=pCv.offsetWidth*dpr;pCv.height=pCv.offsetHeight*dpr;pCtx.scale(dpr,dpr);}
+resP();window.addEventListener('resize',resP);
+for(let i=0;i<40;i++)pts3d.push({x:Math.random()*100});
+function drawPart(){
+  const ctx=pCtx,W=pCv.offsetWidth,H=pCv.offsetHeight;
+  ctx.clearRect(0,0,W*2,H*2);
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#07091A');bg.addColorStop(1,'#0E1525');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W*2,H*2);
+  const sp=getI()/10;
+  const wg=ctx.createLinearGradient(20,0,W-20,0);
+  wg.addColorStop(0,'rgba(96,165,250,0.05)');wg.addColorStop(.5,'rgba(96,165,250,0.2)');wg.addColorStop(1,'rgba(96,165,250,0.05)');
+  ctx.strokeStyle=wg;ctx.lineWidth=14;ctx.beginPath();ctx.moveTo(20,H/2);ctx.lineTo(W-20,H/2);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(20,H/2);ctx.lineTo(W-20,H/2);ctx.stroke();
+  pts3d.forEach(p=>{
+    p.x+=sp;if(p.x>100)p.x-=100;
+    const px=20+(p.x/100)*(W-40);
+    ctx.save();ctx.shadowColor='#60a5fa';ctx.shadowBlur=12;
+    ctx.fillStyle=`rgba(147,197,253,${Math.min(1,.5+sp*.3)})`;
+    ctx.beginPath();ctx.arc(px,H/2,Math.min(7,3+sp*1.5),0,Math.PI*2);ctx.fill();ctx.restore();
+  });
+  ctx.fillStyle='rgba(255,255,255,0.2)';ctx.font='11px Space Grotesk,sans-serif';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('e⁻ →',26,5);
+}
+function animate(){rot.y+=.003;draw3D();drawPart();requestAnimationFrame(animate);}
+animate();
+
+// ── CALCULATOR ───────────────────────────────────────────────
+let cMode='I';
+const cModes={I:{f:'I = V ÷ R',c:'#fbbf24',bg:'rgba(251,191,36,0.08)',bc:'rgba(251,191,36,0.22)',inp:['V','R']},V:{f:'V = I × R',c:'#60a5fa',bg:'rgba(96,165,250,0.08)',bc:'rgba(96,165,250,0.22)',inp:['I','R']},R:{f:'R = V ÷ I',c:'#f87171',bg:'rgba(248,113,113,0.08)',bc:'rgba(248,113,113,0.22)',inp:['V','I']}};
+const vMeta={V:{lbl:'Voltaje',u:'V',c:'#60a5fa',cl:'v-inp',ph:'ej. 12'},I:{lbl:'Corriente',u:'A',c:'#fbbf24',cl:'i-inp',ph:'ej. 3'},R:{lbl:'Resistencia',u:'Ω',c:'#f87171',cl:'r-inp',ph:'ej. 4'}};
+function setCalcMode(m,btn){
+  cMode=m;document.querySelectorAll('.calc-mode-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  const cm=cModes[m],h=document.getElementById('calcHint');
+  h.textContent=cm.f;h.style.color=cm.c;h.style.background=cm.bg;h.style.borderColor=cm.bc;
+  buildCInputs();document.getElementById('calcResult').style.display='none';document.getElementById('calcSteps').style.display='none';drawCV(null,null,null);
+}
+function buildCInputs(){
+  document.getElementById('calcInputs').innerHTML=cModes[cMode].inp.map(v=>{
+    const m=vMeta[v];
+    return`<div class="calc-input-group">
+      <label class="calc-input-label">
+        <span style="width:9px;height:9px;border-radius:50%;background:${m.c};display:inline-block;box-shadow:0 0 6px ${m.c}88;flex-shrink:0;"></span>
+        ${m.lbl} (${m.u})
+      </label>
+      <div style="display:flex;align-items:center;">
+        <input type="number" id="ci_${v}" class="calc-input-field ${m.cl}" placeholder="${m.ph}" min="0" step="any" oninput="liveC()">
+        <span class="calc-unit-badge" style="color:${m.c};">${m.u}</span>
+      </div></div>`;
+  }).join('');
+}
+function liveC(){
+  const vals=cModes[cMode].inp.map(v=>+document.getElementById('ci_'+v)?.value);
+  if(vals.every(v=>v>0))calcOhm();
+}
+function calcOhm(){
+  const vals={};
+  for(const v of cModes[cMode].inp){const n=+document.getElementById('ci_'+v)?.value;if(!n||n<=0){showCErr('Ingresa valores mayores a 0.');return;}vals[v]=n;}
+  let res,steps;
+  if(cMode==='I'){res=vals.V/vals.R;steps=[`Fórmula: I = V ÷ R`,`I = ${vals.V} ÷ ${vals.R}`,`I = ${res.toFixed(4)} A`];}
+  else if(cMode==='V'){res=vals.I*vals.R;steps=[`Fórmula: V = I × R`,`V = ${vals.I} × ${vals.R}`,`V = ${res.toFixed(4)} V`];}
+  else{res=vals.V/vals.I;steps=[`Fórmula: R = V ÷ I`,`R = ${vals.V} ÷ ${vals.I}`,`R = ${res.toFixed(4)} Ω`];}
+  let cV=vals.V,cI=vals.I,cR=vals.R;
+  if(cMode==='I')cI=res;else if(cMode==='V')cV=res;else cR=res;
+  if(!cV)cV=res;if(!cI)cI=res;if(!cR)cR=res;
+  const P=cV*cI;steps.push(`Potencia: P = ${cV.toFixed(2)} × ${cI.toFixed(2)} = ${P.toFixed(3)} W`);
+  const m=vMeta[cMode],rd=document.getElementById('calcResult');
+  rd.style.display='block';
+  rd.innerHTML=`<div class="calc-result-box ${cMode.toLowerCase()}"><div class="calc-result-label">${m.lbl} calculada</div><div class="calc-result-num">${res.toFixed(4)}</div><div class="calc-result-unit">${m.u}</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+    <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Potencia</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--green);font-weight:700;text-shadow:0 0 10px rgba(16,185,129,0.3);">${P.toFixed(2)}</div><div style="font-size:10px;color:var(--muted)">W</div></div>
+    <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.22);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Energía/s</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--teal);font-weight:700;text-shadow:0 0 10px rgba(6,182,212,0.3);">${P.toFixed(2)}</div><div style="font-size:10px;color:var(--muted)">J</div></div>
+  </div>`;
+  const sd=document.getElementById('calcSteps');sd.style.display='block';
+  const sc={V:'#60a5fa',I:'#fbbf24',R:'#f87171'};
+  document.getElementById('calcStepsContent').innerHTML=steps.map((s,i)=>`<div style="color:${i===2?sc[cMode]:i===3?'var(--green)':'rgba(255,255,255,'+(i===0?.35:.55)+')'};padding:1px 0;">${s}</div>`).join('');
+  drawCV(cV,cI,cR);
+}
+function showCErr(msg){const d=document.getElementById('calcResult');d.style.display='block';d.innerHTML=`<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.22);border-radius:10px;padding:12px;color:#f87171;font-size:13px;text-align:center;">${msg}</div>`;}
+function drawCV(cV,cI,cR){
+  const svg=document.getElementById('calcVectorSVG'),leg=document.getElementById('calcVectorLegend');
+  if(!cV){
+    svg.innerHTML=`<text x="160" y="130" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="13" font-family="Space Grotesk,sans-serif">Ingresa valores</text><text x="160" y="152" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="13" font-family="Space Grotesk,sans-serif">para ver vectores</text>${[50,122,194].map(y=>`<line x1="30" y1="${y}" x2="280" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" stroke-dasharray="3 5"/>`).join('')}`;
+    leg.innerHTML='';return;
+  }
+  const vars=[{s:'V',v:cV,u:'V',c:'#60a5fa'},{s:'I',v:cI,u:'A',c:'#fbbf24'},{s:'R',v:cR,u:'Ω',c:'#f87171'}];
+  const gm=Math.max(cV,cI,cR),ml=230;
+  const rows=vars.map((x,i)=>({...x,len:Math.max(18,(x.v/gm)*ml),y:50+i*72}));
+  const hl=cMode;
+  svg.innerHTML=`<defs>${rows.map((r,i)=>`<marker id="cv${i}" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1L11 6L1 11Z" fill="${r.c}" opacity="${r.s===hl?1:.5}"/></marker><filter id="cgw${i}"><feGaussianBlur stdDeviation="${r.s===hl?5:2}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`).join('')}</defs>
+  <line x1="30" y1="15" x2="30" y2="230" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  ${rows.map((r,i)=>{const on=r.s===hl,al=on?1:.48,sw=on?4.5:3;return`
+    <line x1="30" y1="${r.y}" x2="270" y2="${r.y}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" stroke-dasharray="3 5"/>
+    <text x="20" y="${r.y+5}" text-anchor="middle" fill="${r.c}" opacity="${al}" font-size="16" font-weight="700" font-family="JetBrains Mono,monospace">${r.s}</text>
+    <line x1="30" y1="${r.y}" x2="${30+r.len-8}" y2="${r.y}" stroke="${r.c}" stroke-width="${sw}" stroke-linecap="round" opacity="${al}" filter="url(#cgw${i})" marker-end="url(#cv${i})"/>
+    <text x="${30+r.len+12}" y="${r.y+5}" fill="${r.c}" opacity="${Math.min(1,al+.2)}" font-size="13" font-weight="600" font-family="JetBrains Mono,monospace">${r.v.toFixed(3)} ${r.u}</text>
+    ${on?`<rect x="26" y="${r.y-16}" width="${r.len-4}" height="4" rx="2" fill="${r.c}" opacity="0.18"/>`:''}`;}).join('')}
+  ${[0,25,50,75,100].map(p=>`<text x="${30+(p/100)*ml}" y="248" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="9" font-family="JetBrains Mono,monospace">${p}%</text>`).join('')}`;
+  leg.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 9px;background:rgba(255,255,255,0.02);border-radius:6px;border:1px solid rgba(255,255,255,0.04);">
+    <div style="display:flex;align-items:center;gap:7px;"><span style="width:22px;height:3px;background:${r.c};border-radius:2px;display:inline-block;box-shadow:0 0 6px ${r.c}66;"></span><span style="font-size:12px;color:${r.c};">${r.s} — ${r.s==='V'?'Voltaje':r.s==='I'?'Corriente':'Resistencia'}</span></div>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${r.s===cMode?r.c:'var(--muted)'};font-weight:${r.s===cMode?700:400};">${r.v.toFixed(3)} ${r.u}</span></div>`).join('');
+}
+buildCInputs();drawCV(null,null,null);
+
+// ── SCROLL ANIM ───────────────────────────────────────────────
+document.querySelectorAll('.fade-in').forEach(el=>new IntersectionObserver(en=>{if(en[0].isIntersecting)el.classList.add('visible');},{threshold:.08}).observe(el));
+
+update();
+
+// ── MÚSICA ───────────────────────────────────────────────────
+const bgMusic=document.getElementById('bgMusic');
+let musicPlaying=false;
+bgMusic.volume=0.5;
+
+function toggleMusic(){
+  if(musicPlaying){
+    bgMusic.pause();musicPlaying=false;
+    document.getElementById('mpPlayIcon').style.display='';
+    document.getElementById('mpPauseIcon').style.display='none';
+    document.getElementById('mpBars').classList.add('paused');
+  }else{
+    bgMusic.play().catch(()=>{});
+    musicPlaying=true;
+    document.getElementById('mpPlayIcon').style.display='none';
+    document.getElementById('mpPauseIcon').style.display='';
+    document.getElementById('mpBars').classList.remove('paused');
+  }
+}
+function setVol(v){
+  bgMusic.volume=v;
+  const pct=(v*100).toFixed(1)+'%';
+  document.getElementById('volSlider').style.setProperty('--vpct',pct);
+}
+// Actualizar fill del volumen al cargar
+setVol(0.5);
+
+// Autoplay con interacción del usuario (política del navegador)
+document.addEventListener('click',function startAudio(){
+  if(!musicPlaying){
+    bgMusic.play().then(()=>{
+      musicPlaying=true;
+      document.getElementById('mpPlayIcon').style.display='none';
+      document.getElementById('mpPauseIcon').style.display='';
+      document.getElementById('mpBars').classList.remove('paused');
+    }).catch(()=>{});
+  }
+  document.removeEventListener('click',startAudio);
+},{once:true});
+
+// ── KAREN IA ─────────────────────────────────────────────────
+let chatOpen=false;
+function norm(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿¡.,!?;:""]/g,'').replace(/\s+/g,' ').trim();
+}
+const KB=[
+  {exact:['quien fue ohm','quien es ohm','quien fue georg ohm','quien fue georg simon ohm','quien fue el inventor','quien descubrio la ley','historia de ohm','vida de ohm','quien creo la ley','quien invento la ley de ohm','creador de la ley','cuando nacio ohm','cuando murio ohm','biografia de ohm','georg simon','georg ohm','quien era ohm','quien es georg ohm','de donde era ohm','de donde era georg ohm'],k:['quien fue','quien es georg','inventor','descubrio','creo la ley','biografia','nacio ohm'],r:`**Georg Simon Ohm** (1789–1854) fue un físico y matemático alemán nacido en Erlangen, Baviera.\n\n📖 En **1827** publicó *"Die galvanische Kette, mathematisch bearbeitet"*, donde formuló la ley que lleva su nombre.\n\n🏅 Su trabajo fue inicialmente rechazado, pero en **1841** recibió la **Medalla Copley** de la Royal Society.\n\n🎓 Fue profesor de matemáticas y física durante gran parte de su vida.\n\n⚡ La unidad de resistencia eléctrica, el **Ohmio (Ω)**, lleva su nombre en su honor.`},
+  {exact:['que es la ley de ohm','ley de ohm','definicion de la ley de ohm','explicame la ley de ohm','como funciona la ley de ohm','para que sirve la ley de ohm','describe la ley de ohm','cual es la ley de ohm','en que consiste la ley de ohm','que dice la ley de ohm','la ley de ohm'],k:['ley de ohm','que es la ley','definicion de ohm','explica la ley','dice la ley'],r:`**La Ley de Ohm** establece que la tensión (V) aplicada a un conductor es **directamente proporcional** a la corriente (I) que circula por él, siendo la constante de proporcionalidad la resistencia (R).\n\n⚡ Fórmula: **V = I × R**\n\n📌 Esto significa:\n• Si sube el voltaje → sube la corriente\n• Si sube la resistencia → baja la corriente\n\nFue formulada en 1827 y es la base de toda la electrónica moderna.`},
+  {exact:['cuales son las formulas','las formulas','formulas de la ley de ohm','todas las formulas','muestra las formulas','cuales son las ecuaciones','ecuaciones de ohm','formulas de ohm','las tres formulas','las 3 formulas','dame las formulas','que formulas hay','cuantas formulas tiene','cuantas formulas hay'],k:['cuales son las formulas','todas las formulas','formulas de ohm','las tres formulas','dame las formulas'],r:`Las **3 fórmulas** de la Ley de Ohm:\n\n🔵 **Voltaje:**     V = I × R\n🟡 **Corriente:**   I = V ÷ R\n🔴 **Resistencia:** R = V ÷ I\n\n💚 **Potencia (bonus):** P = V × I = I² × R = V² ÷ R\n\n💡 Truco: usa el **triángulo VIR** — cubre la que quieres calcular y el triángulo te muestra la fórmula.`},
+  {exact:['formula del voltaje','formula de voltaje','como calculo el voltaje','calcular voltaje','despejar v','despejar voltaje','como saco el voltaje','como encuentro el voltaje','como se calcula el voltaje','ecuacion del voltaje'],k:['formula voltaje','calcular voltaje','despejar v','como saco v'],r:`Para calcular el **Voltaje**:\n\n🔵 **V = I × R**\n\n📐 Ejemplo:\nSi I = 2 A y R = 6 Ω\nV = 2 × 6 = **12 V**\n\n💡 Voltaje = Corriente × Resistencia`},
+  {exact:['formula de la corriente','formula de corriente','como calculo la corriente','calcular corriente','despejar i','despejar corriente','como saco la corriente','como encuentro la corriente','como se calcula la corriente','ecuacion de la corriente'],k:['formula corriente','calcular corriente','despejar i','como saco i'],r:`Para calcular la **Corriente**:\n\n🟡 **I = V ÷ R**\n\n📐 Ejemplo:\nSi V = 9 V y R = 3 Ω\nI = 9 ÷ 3 = **3 A**\n\n💡 Corriente = Voltaje ÷ Resistencia`},
+  {exact:['formula de la resistencia','formula de resistencia','como calculo la resistencia','calcular resistencia','despejar r','despejar resistencia','como saco la resistencia','como encuentro la resistencia','como se calcula la resistencia','ecuacion de la resistencia'],k:['formula resistencia','calcular resistencia','despejar r','como saco r'],r:`Para calcular la **Resistencia**:\n\n🔴 **R = V ÷ I**\n\n📐 Ejemplo:\nSi V = 12 V e I = 3 A\nR = 12 ÷ 3 = **4 Ω**\n\n💡 Resistencia = Voltaje ÷ Corriente`},
+  {exact:['que es la potencia','potencia electrica','formula de la potencia','calcular potencia','como se calcula la potencia','que son los vatios','que son los watts','que es un vatio','que es watt','para que sirve la potencia'],k:['que es potencia','formula potencia','calcular potencia','vatios','watts','watt','joule'],r:`**Potencia eléctrica (P)** — energía consumida o entregada por segundo.\n\n💚 Fórmulas:\n• **P = V × I**\n• P = I² × R\n• P = V² ÷ R\n\nUnidad: **Vatio (W)** = 1 Joule / segundo\n\n📐 Ejemplo:\n12 V × 3 A = **36 W**\n\n⚡ Un foco de 60 W consume 60 Joules cada segundo.`},
+  {exact:['que es el voltaje','que es la tension','que es la diferencia de potencial','que son los voltios','define voltaje','que mide el voltaje','para que sirve el voltaje'],k:['que es el voltaje','que es tension','que son voltios','define voltaje','diferencia de potencial'],r:`El **Voltaje (V)** es la diferencia de potencial eléctrico entre dos puntos. Representa la "fuerza" que empuja a los electrones a través del conductor.\n\n💧 Analogía: es como la **presión del agua** en una tubería.\n\nUnidad: **Voltio (V)**\n\n📌 A mayor voltaje → más fuerza → más corriente (si R es constante).`},
+  {exact:['que es la corriente','que es la corriente electrica','que son los amperios','corriente electrica','define corriente','que es un amperio','que mide la corriente','para que sirve la corriente','que es la intensidad'],k:['que es la corriente','que son amperios','define corriente','intensidad electrica'],r:`La **Corriente (I)** es el flujo de electrones (cargas eléctricas) que circula a través de un conductor.\n\n🌊 Analogía: el **caudal de agua** en una tubería.\n\n1 Amperio = 1 Coulomb por segundo\n\nUnidad: **Amperio (A)**\n\n📌 Más resistencia → menos corriente (si V es constante).`},
+  {exact:['que es la resistencia','que son los ohmios','que es un ohmio','ohmio que es','que es el ohm','define resistencia','resistencia electrica','que mide la resistencia','para que sirve la resistencia'],k:['que es la resistencia','que son ohmios','define resistencia','que es omega'],r:`La **Resistencia (R)** es la oposición que ofrece un material al paso de la corriente eléctrica.\n\n🪨 Analogía: una **tubería estrecha** que dificulta el paso del agua.\n\nUnidad: **Ohmio (Ω)**\n\n📌 Depende del material, longitud y grosor del conductor.\n• Más largo → más resistencia\n• Más grueso → menos resistencia`},
+  {exact:['que son los conductores','materiales conductores','que es un conductor','cuales son los conductores','ejemplo de conductor','metales conductores'],k:['que son conductores','materiales conductores','conductor electrico'],r:`Los **conductores** son materiales con baja resistencia que permiten el flujo libre de electrones.\n\n🔌 Mejores conductores:\n1. Plata (Ag) — la mejor\n2. **Cobre (Cu)** — la más usada\n3. Oro (Au)\n4. Aluminio (Al)\n\nSe usan en cables, circuitos y componentes eléctricos.`},
+  {exact:['que son los aislantes','materiales aislantes','que es un aislante','cuales son los aislantes','ejemplo de aislante'],k:['que son aislantes','materiales aislantes','aislante electrico'],r:`Los **aislantes** tienen resistencia muy alta e impiden el paso de la corriente.\n\n🧱 Ejemplos comunes:\n• Vidrio\n• Plástico / PVC\n• Madera seca\n• Caucho / hule\n• Cerámica\n\nSe usan para recubrir cables y proteger a las personas.`},
+  {exact:['que son los semiconductores','que es un semiconductor','ejemplo de semiconductor'],k:['semiconductor','semiconductores'],r:`Los **semiconductores** tienen resistencia intermedia entre conductores y aislantes.\n\n💻 Ejemplos:\n• **Silicio (Si)** — el más común\n• Germanio (Ge)\n• Arseniuro de galio (GaAs)\n\nSon la base de los transistores, chips y toda la electrónica moderna 🖥️`},
+  {exact:['circuito en serie','que es un circuito en serie','que es circuito serie','como funciona el circuito serie','resistencias en serie'],k:['circuito serie','en serie','resistencias serie'],r:`**Circuito en Serie** 🔴🔴🔴 (uno tras otro)\n\n• La corriente I es **igual** en todos los elementos\n• El voltaje se **divide**: V_t = V₁ + V₂ + V₃\n• La resistencia **suma**: R_t = R₁ + R₂ + R₃\n\n📌 Si uno falla → todo el circuito se apaga (ej: luces viejas de navidad).`},
+  {exact:['circuito en paralelo','que es un circuito en paralelo','que es circuito paralelo','como funciona el circuito paralelo','resistencias en paralelo'],k:['circuito paralelo','en paralelo','resistencias paralelo'],r:`**Circuito en Paralelo** 🔵||🔵 (lado a lado)\n\n• El voltaje V es **igual** en todos los elementos\n• La corriente **se divide**: I_t = I₁ + I₂ + I₃\n• La resistencia total **baja**: 1/R_t = 1/R₁ + 1/R₂ + …\n\n📌 Si uno falla → los demás siguen funcionando (ej: enchufes de tu casa).`},
+  {exact:['diferencia entre serie y paralelo','diferencia serie y paralelo','cual es la diferencia entre serie y paralelo','serie vs paralelo'],k:['diferencia serie paralelo','serie vs paralelo'],r:`**Serie vs Paralelo:**\n\n🔴 **Serie:** corriente igual, voltaje se divide, R suma, si uno falla todo se apaga.\n\n🔵 **Paralelo:** voltaje igual, corriente se divide, R baja, si uno falla los demás siguen.\n\n🏠 Tu casa usa paralelo para que cada aparato funcione igual.`},
+  {exact:['circuito mixto','que es un circuito mixto','como funciona circuito mixto'],k:['circuito mixto'],r:`Un **circuito mixto** combina elementos en **serie y en paralelo**.\n\n📐 Para analizarlo:\n1. Identificar las partes en paralelo → calcular su R equivalente\n2. Sumar esa R con las que están en serie\n3. Aplicar la Ley de Ohm normalmente\n\n🔑 Divide el circuito en partes simples y resuélvelas paso a paso.`},
+  {exact:['ejemplos reales','ejemplos de la ley de ohm','aplicaciones reales','aplicaciones de la ley de ohm','vida real','ejemplos practicos','donde se aplica','para que se usa la ley de ohm'],k:['ejemplos reales','aplicaciones reales','vida real','ejemplo practico','donde se aplica'],r:`**Aplicaciones reales de la Ley de Ohm:**\n\n💡 Bombilla (120 V / 1440 Ω) → I = 0.083 A, P = 10 W\n🚗 Batería de auto (12 V / 0.5 Ω) → I = 24 A, P = 288 W\n📱 Cargador celular (5 V / 0.1 Ω) → controlado por chip\n🔊 Altavoz (8 Ω, 2 A) → V = 16 V\n⚡ Fusibles, dimmers, reguladores\n🔌 Todo circuito eléctrico en tu hogar`},
+  {exact:['que es la ley de kirchhoff','kirchhoff','leyes de kirchhoff','ley de kirchhoff'],k:['kirchhoff','leyes de kirchhoff'],r:`Las **Leyes de Kirchhoff** complementan la Ley de Ohm:\n\n🔵 **KCL (nodos):** La suma de corrientes que entran = suma de las que salen.\n\n🔴 **KVL (mallas):** La suma de voltajes en una malla cerrada = 0.\n\nSon fundamentales para analizar circuitos complejos con múltiples fuentes.`},
+  {exact:['que es un electron','que son los electrones','como se mueven los electrones','que es la carga electrica','que es un coulomb'],k:['que es electron','electrones','cargas electricas','coulomb'],r:`Los **electrones** son partículas subatómicas con carga negativa que orbitan el núcleo de los átomos.\n\n⚡ En los conductores, los electrones **libres** se mueven cuando hay voltaje.\n\n🔢 1 Coulomb = 6.24 × 10¹⁸ electrones\n\nEse movimiento ordenado de electrones es la **corriente eléctrica**.`},
+  {exact:['que es la resistividad','resistividad','de que depende la resistencia','que factores afectan la resistencia'],k:['resistividad','de que depende resistencia','factores resistencia'],r:`La **resistencia** de un conductor depende de:\n\n📏 **Longitud (L):** más largo → más resistencia\n⭕ **Área (A):** más grueso → menos resistencia\n🧪 **Material (ρ):** cada material tiene su resistividad\n🌡️ **Temperatura:** más calor → más resistencia (en metales)\n\n**Fórmula:** R = ρ × L / A`},
+  {exact:['que es un voltimetro','voltimetro','como se usa el voltimetro','para que sirve el voltimetro'],k:['voltimetro','que mide voltimetro'],r:`El **voltímetro** mide el **voltaje** (diferencia de potencial).\n\n🔌 Se conecta **en paralelo** con el elemento a medir.\n\n📌 Tiene resistencia interna muy alta para no alterar el circuito.`},
+  {exact:['que es un amperimetro','amperimetro','como se usa el amperimetro','para que sirve el amperimetro'],k:['amperimetro','que mide amperimetro'],r:`El **amperímetro** mide la **corriente eléctrica**.\n\n🔌 Se conecta **en serie** con el circuito.\n\n📌 Tiene resistencia interna muy baja para no obstruir la corriente.`},
+  {exact:['que es un multimetro','multimetro','como se usa el multimetro','para que sirve el multimetro'],k:['multimetro','tester'],r:`El **multímetro** mide **voltaje, corriente y resistencia** en un solo aparato.\n\n🔧 Modos:\n• **V** → Voltaje (AC o DC)\n• **A** → Corriente\n• **Ω** → Resistencia\n\n📌 Es la herramienta básica de cualquier técnico eléctrico.`},
+  {exact:['que es un cortocircuito','cortocircuito','como ocurre un cortocircuito'],k:['cortocircuito','corto circuito'],r:`Un **cortocircuito** ocurre cuando la corriente encuentra un camino de **resistencia casi cero**.\n\n⚠️ Por Ley de Ohm: si R → 0, entonces I → ∞\n\nEso genera:\n• Calor extremo 🔥\n• Puede fundir cables\n• Activa fusibles/breakers\n• Peligro de incendio\n\n🛡️ Por eso los fusibles y breakers son esenciales.`},
+  {exact:['que es un fusible','fusible','para que sirve el fusible','como funciona el fusible'],k:['fusible','que es fusible'],r:`Un **fusible** es un componente de seguridad que **se funde** cuando la corriente supera un valor límite.\n\n🔥 Protege el circuito de sobrecorrientes.\n\n⚡ Por Ley de Ohm: si R baja → I sube → el fusible corta el circuito.`},
+  {exact:['que es la energia electrica','energia electrica','formula de la energia electrica','que es el kilowatt hora','kwh'],k:['energia electrica','kwh','kilowatt hora'],r:`**Energía eléctrica (E)** es la potencia consumida en un tiempo.\n\n💡 **E = P × t**\n\nEjemplo: 1000 W durante 1 hora = **1 kWh** (lo que cobra la empresa de electricidad)\n\n⚡ E = V × I × t`},
+  {exact:['que es el efecto joule','efecto joule','por que se calientan los cables'],k:['efecto joule','calor joule','cables calientan'],r:`El **Efecto Joule** es la generación de calor cuando la corriente pasa por un conductor.\n\n🔥 **Q = I² × R × t**\n\n💡 Aplicaciones:\n• Plancha, tostadora, foco incandescente, calefactor\n\n⚠️ También causa pérdidas de energía en cables de transmisión.`},
+  {exact:['que es una bateria','bateria','que es una pila','como funciona una bateria'],k:['que es bateria','bateria electrica','fuente de voltaje','pila electrica'],r:`Una **batería** es una fuente de energía que mantiene un voltaje constante entre sus terminales.\n\n⚡ Convierte energía química en eléctrica.\n\n🔋 Ejemplos:\n• Pila AA: 1.5 V\n• Batería celular: 3.7 V\n• Batería de auto: 12 V\n• Red eléctrica: 120 V AC`},
+  {exact:['como estudiar la ley de ohm','como aprendo la ley de ohm','trucos para recordar ohm','como memorizo la ley de ohm','tips ohm'],k:['como estudiar','como aprendo','como memorizo','trucos ohm','tip ohm'],r:`**Tips para memorizar la Ley de Ohm:**\n\n🔺 **El triángulo VIR** — tapa la variable que buscas:\n• Tapa V → I × R\n• Tapa I → V ÷ R\n• Tapa R → V ÷ I\n\n💧 **Analogía del agua:** voltaje=presión, corriente=caudal, resistencia=tubería\n\n🎵 **Mnemónica:** "**V**oy a **I**r a **R**omar" → V = I × R`},
+  {exact:['si aumento el voltaje que pasa','que pasa si subo el voltaje'],k:['si aumento voltaje','si subo voltaje','que pasa si sube voltaje'],r:`Si **aumentas el Voltaje** (con R constante):\n\n⬆️ V sube → **I sube proporcionalmente**\n\n📐 Si V se duplica → I se duplica\n• 6V / 2Ω = 3A\n• 12V / 2Ω = 6A ← el doble\n\n⚡ Más voltaje = más "fuerza" para mover electrones.`},
+  {exact:['si aumento la resistencia que pasa','que pasa si subo la resistencia'],k:['si aumento resistencia','si subo resistencia','que pasa si sube resistencia'],r:`Si **aumentas la Resistencia** (con V constante):\n\n⬆️ R sube → **I baja inversamente**\n\n📐 Si R se duplica → I se reduce a la mitad\n• 12V / 2Ω = 6A\n• 12V / 4Ω = 3A ← la mitad\n\n🪨 Más resistencia = más obstáculo para los electrones.`},
+  {exact:['que pasa si la resistencia es 0','resistencia cero'],k:['resistencia cero','r igual 0'],r:`Si **R = 0 Ω** (resistencia cero):\n\n⚡ I = V ÷ 0 = **infinito teórico**\n\n⚠️ Esto es un **cortocircuito** — en la práctica:\n• Se funden los cables\n• Se activan fusibles/breakers\n• Puede causar incendio 🔥`},
+  {exact:['corriente alterna','corriente directa','diferencia ca y cd','que es ca','que es cd','que es ac','que es dc'],k:['corriente alterna','corriente directa','ca y cd','ac dc'],r:`**Corriente Directa (CD/DC):**\n• Fluye siempre en la misma dirección\n• Baterías, cargadores, paneles solares\n\n**Corriente Alterna (CA/AC):**\n• Cambia de dirección cíclicamente (60 Hz en América)\n• Lo que llega a tu casa (120 V)\n• La Ley de Ohm aplica con impedancia (Z)`},
+  {exact:['quien hizo esto','quienes hicieron esto','el equipo','proyecto gaes','gaes','quienes son','quien lo hizo'],k:['proyecto gaes','gaes','equipo','quienes son','quien hizo'],r:`¡Proyecto **GAES** hecho con 💙 por:\n\n👩‍🔬 Edier Bejarano\n👩‍🔬 Karen Carrero\n👨‍🔬 Juan Zarate\n👩‍🔬 Luz Reyes\n👨‍🔬 Carlos Mendez\n\n⚡ ¡Un equipo increíble! 🎓`},
+  {exact:['gracias','muchas gracias','thanks','thank you','gracias karen','muy bien','chevere','perfecto','excelente'],k:['gracias','thanks'],r:`¡Con mucho gusto! 😊 Si tienes más dudas sobre Física Eléctrica, aquí estoy. ¡Éxito en el proyecto GAES! ⚡`},
+  {exact:['quien eres','quien eres tu','como te llamas','que eres','presentate'],k:['quien eres','como te llamas','presentate'],r:`¡Hola! Soy **Karen** 👩‍🔬, la asistente virtual de Física Eléctrica del proyecto GAES.\n\nPuedo ayudarte con:\n⚡ Ley de Ohm\n🔌 Circuitos eléctricos\n📐 Vectores eléctricos\n🧮 Cálculos de V, I, R y P\n\n¿En qué te puedo ayudar?`},
+  {exact:['hola','hi','hey','buenas','buenos dias','buenas tardes','buenas noches','hola karen','que tal','como estas'],k:['hola karen','hi karen'],r:`¡Hola! 👋 Soy **Karen**, tu asistente de Física Eléctrica.\n\n¿Qué quieres aprender hoy sobre la Ley de Ohm? ⚡\n\nPuedes preguntarme sobre fórmulas, circuitos, historia, ejemplos o lo que necesites 😊`},
+  {exact:['adios','chao','hasta luego','bye','nos vemos','hasta pronto'],k:['adios','chao','bye','hasta luego'],r:`¡Hasta luego! 👋 Fue un placer ayudarte. Recuerda: **V = I × R** 😄⚡`},
+];
+const QUICK=['¿Qué es la Ley de Ohm?','¿Quién fue Georg Ohm?','¿Cuáles son las fórmulas?','¿Qué es el voltaje?','¿Qué es la corriente?','¿Qué es la resistencia?','Circuito serie vs paralelo','Ejemplos reales','¿Qué es el cortocircuito?','Tips para estudiar'];
+function karenReply(raw){
+  const m=norm(raw);
+  for(const e of KB){if(e.exact.some(ex=>m===norm(ex)||m.includes(norm(ex))))return e.r;}
+  for(const e of KB){if(e.k.some(k=>m.includes(norm(k))))return e.r;}
+  return`Hmm, no estoy segura de esa 🤔\n\nPuedo ayudarte con:\n• Qué es la Ley de Ohm\n• Quién fue Georg Ohm\n• Las 3 fórmulas (V, I, R)\n• Potencia eléctrica\n• Tipos de circuitos\n• Aplicaciones reales\n\n¿Sobre cuál te gustaría saber?`;
+}
+function fmtMd(t){return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');}
+function addMsg(text,role){
+  const wrap=document.getElementById('karenMessages');
+  const d=document.createElement('div');d.className=`k-msg ${role}`;
+  if(role==='karen'){d.innerHTML=`<div class="k-av"><img src="karen.jpeg" alt="K" onerror="this.parentElement.innerHTML='<div class=\\'k-av-fb\\'>K</div>'"></div><div class="k-bubble">${fmtMd(text)}</div>`;}
+  else{d.innerHTML=`<div class="k-bubble">${text}</div>`;}
+  wrap.appendChild(d);wrap.scrollTop=wrap.scrollHeight;
+}
+function showTyping(){
+  const wrap=document.getElementById('karenMessages');
+  const d=document.createElement('div');d.className='k-msg karen';d.id='kTyping';
+  d.innerHTML=`<div class="k-av"><img src="karen.jpeg" alt="K" onerror="this.parentElement.innerHTML='<div class=\\'k-av-fb\\'>K</div>'"></div><div class="k-typing"><span></span><span></span><span></span></div>`;
+  wrap.appendChild(d);wrap.scrollTop=wrap.scrollHeight;
+}
+function rmTyping(){const t=document.getElementById('kTyping');if(t)t.remove();}
+function buildQuicks(){document.getElementById('karenQuicks').innerHTML=QUICK.map(q=>`<button class="k-quick" onclick="sendMsg('${q}')">${q}</button>`).join('');}
+function sendMsg(custom){
+  const inp=document.getElementById('karenInput');
+  const text=(custom||inp.value).trim();
+  if(!text)return;
+  inp.value='';inp.style.height='38px';
+  document.getElementById('karenQuicks').innerHTML='';
+  if(norm(text)==='video'){
+    addMsg(text,'user');
+    setTimeout(()=>{showTyping();setTimeout(()=>{rmTyping();addMsg('🎬 ¡Modo secreto activado! Reproduciendo…','karen');buildQuicks();openVideo();},900);},150);
+    return;
+  }
+  addMsg(text,'user');showTyping();
+  setTimeout(()=>{rmTyping();addMsg(karenReply(text),'karen');buildQuicks();},550+Math.random()*600);
+}
+function toggleChat(){
+  chatOpen=!chatOpen;
+  const chat=document.getElementById('karenChat'),btn=document.getElementById('collapseBtn');
+  if(chatOpen){
+    chat.classList.remove('hidden');btn.textContent='▼';
+    if(!document.getElementById('karenMessages').children.length){
+      setTimeout(()=>{showTyping();setTimeout(()=>{rmTyping();addMsg('¡Hola! 👋 Soy **Karen**, tu asistente de Física Eléctrica.\n\n¿Sobre qué quieres aprender hoy? ⚡','karen');buildQuicks();},900);},200);
+    }else buildQuicks();
+  }else{chat.classList.add('hidden');btn.textContent='▲';}
+}
+document.getElementById('karenInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+document.getElementById('karenInput').addEventListener('input',function(){this.style.height='38px';this.style.height=Math.min(this.scrollHeight,90)+'px';});
+
+// ── VIDEO SECRETO ─────────────────────────────────────────────
+function openVideo(){
+  const ov=document.getElementById('videoOverlay'),vid=document.getElementById('videoEl');
+  vid.src='perro.mp4';vid.load();
+  ov.classList.add('show');document.body.style.overflow='hidden';
+  setTimeout(()=>vid.play().catch(()=>{}),100);
+}
+function closeVideo(e,force){
+  if(!force&&e&&e.target!==document.getElementById('videoOverlay'))return;
+  const ov=document.getElementById('videoOverlay'),vid=document.getElementById('videoEl');
+  ov.classList.remove('show');vid.pause();
+  setTimeout(()=>{vid.src='';},500);
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVideo(null,true);});
+</script>
+</body>
+</html>
