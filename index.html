@@ -14,6 +14,7 @@
   --text:#E8ECF4;--muted:#7A8BA8;
   --glow-v:rgba(26,108,246,0.5);--glow-i:rgba(245,158,11,0.5);--glow-r:rgba(239,68,68,0.5);
   --glow-g:rgba(16,185,129,0.4);--glow-p:rgba(139,92,246,0.4);
+  --co-yellow:#FCD116;--co-blue:#003893;--co-red:#CE1126;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -26,10 +27,65 @@ body{
     radial-gradient(ellipse 60% 40% at 80% 100%,rgba(139,92,246,0.06) 0%,transparent 60%);
 }
 
+/* ══ EVENTO MUNDIAL COLOMBIA ══ */
+#worldCupBanner{
+  position:relative;width:100%;overflow:hidden;
+  background:linear-gradient(90deg,var(--co-yellow) 0%,var(--co-yellow) 33%,var(--co-blue) 33%,var(--co-blue) 66%,var(--co-red) 66%,var(--co-red) 100%);
+  padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 2px 20px rgba(0,0,0,0.4);
+}
+#worldCupBanner::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
+  width:40%;animation:wcShine 3.5s ease-in-out infinite;
+}
+@keyframes wcShine{0%{transform:translateX(-150%);}100%{transform:translateX(350%);}}
+.wc-content{
+  display:flex;align-items:center;gap:10px;position:relative;z-index:1;
+  flex-wrap:wrap;justify-content:center;
+}
+.wc-ball{
+  font-size:clamp(18px,4vw,24px);
+  animation:wcSpin 3s linear infinite;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+}
+@keyframes wcSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.wc-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(13px,3.2vw,18px);
+  letter-spacing:0.5px;
+  color:#fdfeff;
+  text-shadow:0 1px 2px rgba(255,255,255,0.3);
+  font-weight:700;
+}
+.wc-close{
+  background:rgba(10,14,26,0.18);border:1px solid rgba(10,14,26,0.3);
+  color:#0A0E1A;width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;cursor:pointer;flex-shrink:0;
+  transition:background .2s;position:relative;z-index:1;
+  margin-left:6px;
+}
+.wc-close:hover{background:rgba(10,14,26,0.32);}
+#worldCupBanner.hidden{display:none;}
+
+/* Confetti container */
+#confettiLayer{
+  position:fixed;inset:0;pointer-events:none;z-index:8500;overflow:hidden;
+}
+.confetti-piece{
+  position:absolute;top:-20px;border-radius:2px;
+  animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1;}
+  100%{transform:translateY(110vh) rotate(540deg);opacity:0.3;}
+}
+
 /* ── HERO ── */
 .hero{
   position:relative;text-align:center;
-  padding:clamp(36px,8vw,64px) 20px 48px;overflow:hidden;
+  padding:clamp(32px,7vw,56px) 20px 48px;overflow:hidden;
 }
 .hero::before{
   content:'';position:absolute;top:-100px;left:50%;
@@ -80,7 +136,9 @@ body{
 .formula-hero .eq{color:var(--muted);}
 .formula-hero .i{color:#fbbf24;text-shadow:0 0 20px rgba(251,191,36,0.5);}
 .formula-hero .r{color:#f87171;text-shadow:0 0 20px rgba(248,113,113,0.5);}
-
+</style>
+</head>
+<style id="part2style">
 /* ── LAYOUT ── */
 .container{max-width:1200px;margin:0 auto;padding:0 clamp(14px,4vw,28px) 90px;}
 .section-title{
@@ -112,9 +170,7 @@ body{
   position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;
 }
 .info-box:hover{transform:translateY(-3px);}
-.info-box::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0;
-}
+.info-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0;}
 .info-box.v{background:linear-gradient(135deg,rgba(26,108,246,0.13),rgba(26,108,246,0.06));border:1px solid rgba(26,108,246,0.25);}
 .info-box.v::before{background:linear-gradient(90deg,var(--blue),var(--blue2));box-shadow:0 0 16px var(--glow-v);}
 .info-box.i{background:linear-gradient(135deg,rgba(245,158,11,0.13),rgba(245,158,11,0.06));border:1px solid rgba(245,158,11,0.25);}
@@ -338,11 +394,24 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   .ctrl-value{font-size:26px;}
   .power-value{font-size:30px;}
   #musicPlayer{padding:8px 12px;gap:8px;}
+  .wc-text{font-size:12px;}
 }
 @media(max-width:360px){.hero-title{font-size:44px;}}
 </style>
-</head>
 <body>
+
+<!-- BANNER EVENTO MUNDIAL -->
+<div id="worldCupBanner">
+  <div class="wc-content">
+    <span class="wc-ball">⚽</span>
+    <span class="wc-text">🇨🇴 ¡VAMOS COLOMBIA HPTAAA! — GAES celebra con la Tricolor</span>
+    <span class="wc-ball">🏆</span>
+  </div>
+  <button class="wc-close" onclick="closeBanner()" title="Cerrar">✕</button>
+</div>
+
+<!-- Capa de confeti -->
+<div id="confettiLayer"></div>
 
 <!-- MÚSICA DE FONDO -->
 <audio id="bgMusic" loop>
@@ -351,7 +420,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-label">⚡ Proyecto GAES</div>
+  <div class="hero-label">⚡ Proyecto GAES <span style="margin-left:4px;">🇨🇴</span></div>
   <h1 class="hero-title">LEY DE OHM</h1>
   <p class="hero-sub">Explora la relación fundamental entre voltaje, corriente y resistencia con simulaciones en tiempo real</p>
   <div class="formula-hero">
@@ -486,7 +555,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
   <div class="divider"></div>
   <p style="text-align:center;font-size:11px;color:var(--muted);line-height:1.9;">
-    ⚡ Ley de Ohm · Física Eléctrica · Proyecto GAES<br>
+    ⚡ Ley de Ohm · Física Eléctrica · Proyecto GAES <span style="color:var(--co-yellow)">🇨🇴</span><br>
     <span style="color:rgba(139,92,246,0.6)">✦</span>
     Edier Bejarano · Karen Carrero · Juan Zarate · Luz Reyes · Carlos Mendez
     <span style="color:rgba(139,92,246,0.6)">✦</span>
@@ -548,9 +617,38 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     <video id="videoEl" playsinline></video>
   </div>
 </div>
-
 <script>
-// ── SIMULATOR ────────────────────────────────────────────────
+// ══ EVENTO MUNDIAL — BANNER + CONFETI ══════════════════════════
+function closeBanner(){
+  document.getElementById('worldCupBanner').classList.add('hidden');
+  localStorage_safe_set('wcBannerClosed','1');
+}
+function localStorage_safe_set(){} // no-op (storage no soportado en artifacts; banner solo se oculta en sesión)
+
+function launchConfetti(count){
+  const layer=document.getElementById('confettiLayer');
+  const colors=['#FCD116','#003893','#CE1126','#FCD116','#CE1126'];
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    const size=4+Math.random()*6;
+    p.style.width=size+'px';
+    p.style.height=(size*1.6)+'px';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    const dur=2.5+Math.random()*2.5;
+    p.style.animationDuration=dur+'s';
+    p.style.animationDelay=(Math.random()*1.2)+'s';
+    layer.appendChild(p);
+    setTimeout(()=>p.remove(),(dur+1.5)*1000);
+  }
+}
+// Confeti de bienvenida al cargar (sutil, evento especial)
+window.addEventListener('load',()=>{
+  setTimeout(()=>launchConfetti(36),400);
+});
+
+// ══ SIMULATOR ════════════════════════════════════════════════
 let V=12,R=4;
 const getI=()=>V/R,getP=()=>V*getI();
 function update(){
@@ -569,14 +667,14 @@ function setFill(id,val,min,max){
 document.getElementById('vSlider').addEventListener('input',e=>{V=+e.target.value;update();});
 document.getElementById('rSlider').addEventListener('input',e=>{R=+e.target.value;update();});
 
-// ── VECTORS ──────────────────────────────────────────────────
+// ══ VECTORS ══════════════════════════════════════════════════
 function drawVectors(){
   const svg=document.getElementById('vectorCanvas');
   const I=getI(),W=700,H=220,mg=60,av=W-mg*2;
   const rows=[
-    {y:55,len:(V/24)*(av*.85),color:'#60a5fa',glow:'rgba(96,165,250,0.5)',label:`V = ${V.toFixed(1)} V`,sym:'V'},
-    {y:115,len:(I/24)*(av*.85),color:'#fbbf24',glow:'rgba(251,191,36,0.5)',label:`I = ${I.toFixed(2)} A`,sym:'I'},
-    {y:175,len:(R/20)*(av*.85),color:'#f87171',glow:'rgba(248,113,113,0.5)',label:`R = ${R.toFixed(1)} Ω`,sym:'R'},
+    {y:55,len:(V/24)*(av*.85),color:'#60a5fa',label:`V = ${V.toFixed(1)} V`,sym:'V'},
+    {y:115,len:(I/24)*(av*.85),color:'#fbbf24',label:`I = ${I.toFixed(2)} A`,sym:'I'},
+    {y:175,len:(R/20)*(av*.85),color:'#f87171',label:`R = ${R.toFixed(1)} Ω`,sym:'R'},
   ];
   svg.innerHTML=`<defs>
     ${rows.map((r,i)=>`
@@ -596,7 +694,7 @@ function drawVectors(){
     <line x1="${mg}" y1="${r.y}" x2="${mg+av}" y2="${r.y}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4 4"/>`).join('')}`;
 }
 
-// ── GRAPH ────────────────────────────────────────────────────
+// ══ GRAPH ════════════════════════════════════════════════════
 function drawGraph(){
   const cv=document.getElementById('graphCanvas');
   const ctx=cv.getContext('2d');
@@ -629,7 +727,6 @@ function drawGraph(){
     ctx.font='10px JetBrains Mono';ctx.textAlign='left';
     ctx.fillText('R='+rv+'Ω',Math.min(p.l+w-40,ex+4),Math.max(p.t+14,ey-5));
   });
-  // Gradient fill under current R line
   const I=getI(),px2=p.l+(24/24)*w,py2=p.t+h-(24/R/25)*h;
   const fill=ctx.createLinearGradient(p.l,0,px2,0);
   fill.addColorStop(0,'rgba(248,113,113,0.06)');fill.addColorStop(1,'rgba(248,113,113,0.01)');
@@ -651,7 +748,7 @@ function drawGraph(){
   ctx.fillText(`R = ${R.toFixed(1)} Ω`,p.l+w-4,p.t+14);
 }
 
-// ── TRIANGLE ─────────────────────────────────────────────────
+// ══ TRIANGLE ═════════════════════════════════════════════════
 const triCv=document.getElementById('triangleCanvas');
 const triCtx=triCv.getContext('2d');
 let selVar='V';
@@ -683,7 +780,7 @@ triCv.addEventListener('click',e=>{
 });
 drawTri('V');
 
-// ── 3D CIRCUIT ───────────────────────────────────────────────
+// ══ 3D CIRCUIT ═══════════════════════════════════════════════
 const c3d=document.getElementById('circuitCanvas');
 const c3ctx=c3d.getContext('2d');
 let rot={x:.3,y:.5},drag=false,lm={},pts3d=[];
@@ -732,7 +829,7 @@ function draw3D(){
   ctx.fillText('I = '+getI().toFixed(2)+' A →',(t0.x+t1.x)/2,(t0.y+t1.y)/2-18);ctx.restore();
 }
 
-// ── PARTICLES ────────────────────────────────────────────────
+// ══ PARTICLES ════════════════════════════════════════════════
 const pCv=document.getElementById('particleCanvas');
 const pCtx=pCv.getContext('2d');
 function resP(){const dpr=window.devicePixelRatio||1;pCv.width=pCv.offsetWidth*dpr;pCv.height=pCv.offsetHeight*dpr;pCtx.scale(dpr,dpr);}
@@ -759,8 +856,9 @@ function drawPart(){
 }
 function animate(){rot.y+=.003;draw3D();drawPart();requestAnimationFrame(animate);}
 animate();
-
-// ── CALCULATOR ───────────────────────────────────────────────
+</script>
+<script>
+// ══ CALCULATOR ═══════════════════════════════════════════════
 let cMode='I';
 const cModes={I:{f:'I = V ÷ R',c:'#fbbf24',bg:'rgba(251,191,36,0.08)',bc:'rgba(251,191,36,0.22)',inp:['V','R']},V:{f:'V = I × R',c:'#60a5fa',bg:'rgba(96,165,250,0.08)',bc:'rgba(96,165,250,0.22)',inp:['I','R']},R:{f:'R = V ÷ I',c:'#f87171',bg:'rgba(248,113,113,0.08)',bc:'rgba(248,113,113,0.22)',inp:['V','I']}};
 const vMeta={V:{lbl:'Voltaje',u:'V',c:'#60a5fa',cl:'v-inp',ph:'ej. 12'},I:{lbl:'Corriente',u:'A',c:'#fbbf24',cl:'i-inp',ph:'ej. 3'},R:{lbl:'Resistencia',u:'Ω',c:'#f87171',cl:'r-inp',ph:'ej. 4'}};
@@ -837,12 +935,12 @@ function drawCV(cV,cI,cR){
 }
 buildCInputs();drawCV(null,null,null);
 
-// ── SCROLL ANIM ───────────────────────────────────────────────
+// ══ SCROLL ANIM ══════════════════════════════════════════════
 document.querySelectorAll('.fade-in').forEach(el=>new IntersectionObserver(en=>{if(en[0].isIntersecting)el.classList.add('visible');},{threshold:.08}).observe(el));
 
 update();
 
-// ── MÚSICA ───────────────────────────────────────────────────
+// ══ MÚSICA ═══════════════════════════════════════════════════
 const bgMusic=document.getElementById('bgMusic');
 let musicPlaying=false;
 bgMusic.volume=0.5;
@@ -863,13 +961,10 @@ function toggleMusic(){
 }
 function setVol(v){
   bgMusic.volume=v;
-  const pct=(v*100).toFixed(1)+'%';
-  document.getElementById('volSlider').style.setProperty('--vpct',pct);
+  document.getElementById('volSlider').style.setProperty('--vpct',(v*100).toFixed(1)+'%');
 }
-// Actualizar fill del volumen al cargar
 setVol(0.5);
 
-// Autoplay con interacción del usuario (política del navegador)
 document.addEventListener('click',function startAudio(){
   if(!musicPlaying){
     bgMusic.play().then(()=>{
@@ -881,8 +976,9 @@ document.addEventListener('click',function startAudio(){
   }
   document.removeEventListener('click',startAudio);
 },{once:true});
-
-// ── KAREN IA ─────────────────────────────────────────────────
+</script>
+<script>
+// ══ KAREN IA ══════════════════════════════════════════════════
 let chatOpen=false;
 function norm(s){
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿¡.,!?;:""]/g,'').replace(/\s+/g,' ').trim();
@@ -927,6 +1023,7 @@ const KB=[
   {exact:['quien eres','quien eres tu','como te llamas','que eres','presentate'],k:['quien eres','como te llamas','presentate'],r:`¡Hola! Soy **Karen** 👩‍🔬, la asistente virtual de Física Eléctrica del proyecto GAES.\n\nPuedo ayudarte con:\n⚡ Ley de Ohm\n🔌 Circuitos eléctricos\n📐 Vectores eléctricos\n🧮 Cálculos de V, I, R y P\n\n¿En qué te puedo ayudar?`},
   {exact:['hola','hi','hey','buenas','buenos dias','buenas tardes','buenas noches','hola karen','que tal','como estas'],k:['hola karen','hi karen'],r:`¡Hola! 👋 Soy **Karen**, tu asistente de Física Eléctrica.\n\n¿Qué quieres aprender hoy sobre la Ley de Ohm? ⚡\n\nPuedes preguntarme sobre fórmulas, circuitos, historia, ejemplos o lo que necesites 😊`},
   {exact:['adios','chao','hasta luego','bye','nos vemos','hasta pronto'],k:['adios','chao','bye','hasta luego'],r:`¡Hasta luego! 👋 Fue un placer ayudarte. Recuerda: **V = I × R** 😄⚡`},
+  {exact:['mundial','colombia mundial','seleccion colombia','vamos colombia','colombia futbol'],k:['mundial','seleccion colombia','vamos colombia'],r:`¡Vamos Colombia! 🇨🇴⚽\n\nEsta página tiene una edición especial con los colores de la **Tricolor** (amarillo, azul y rojo) para celebrar el Mundial.\n\n¡Aunque seamos de Física, el amor por Colombia no falta! 🏆💛💙❤️`},
 ];
 const QUICK=['¿Qué es la Ley de Ohm?','¿Quién fue Georg Ohm?','¿Cuáles son las fórmulas?','¿Qué es el voltaje?','¿Qué es la corriente?','¿Qué es la resistencia?','Circuito serie vs paralelo','Ejemplos reales','¿Qué es el cortocircuito?','Tips para estudiar'];
 function karenReply(raw){
@@ -978,7 +1075,7 @@ function toggleChat(){
 document.getElementById('karenInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
 document.getElementById('karenInput').addEventListener('input',function(){this.style.height='38px';this.style.height=Math.min(this.scrollHeight,90)+'px';});
 
-// ── VIDEO SECRETO ─────────────────────────────────────────────
+// ══ VIDEO SECRETO ════════════════════════════════════════════
 function openVideo(){
   const ov=document.getElementById('videoOverlay'),vid=document.getElementById('videoEl');
   vid.src='perro.mp4';vid.load();
