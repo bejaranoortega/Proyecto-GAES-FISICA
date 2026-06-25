@@ -148,6 +148,29 @@ body{
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 .section-desc{font-size:clamp(13px,3.5vw,14px);color:var(--muted);margin-bottom:22px;line-height:1.65;}
+
+/* ── PURPOSE BOX (para qué sirve cada función) ── */
+.purpose-box{
+  display:flex;gap:12px;align-items:flex-start;
+  background:linear-gradient(135deg,rgba(26,108,246,0.1),rgba(139,92,246,0.05));
+  border:1px solid rgba(26,108,246,0.22);border-radius:14px;
+  padding:clamp(12px,3vw,16px) clamp(14px,3.5vw,18px);
+  margin-bottom:22px;position:relative;overflow:hidden;
+}
+.purpose-box::before{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--blue),var(--purple));
+  box-shadow:0 0 12px rgba(26,108,246,0.5);
+}
+.purpose-icon{
+  font-size:clamp(18px,4vw,22px);flex-shrink:0;line-height:1;
+  width:34px;height:34px;border-radius:10px;
+  background:rgba(26,108,246,0.14);border:1px solid rgba(26,108,246,0.3);
+  display:flex;align-items:center;justify-content:center;
+}
+.purpose-text{font-size:clamp(12.5px,3.2vw,13.5px);color:var(--text);line-height:1.6;}
+.purpose-text strong{color:var(--blue2);}
+.purpose-label{font-size:9.5px;text-transform:uppercase;letter-spacing:1.5px;color:var(--blue2);font-weight:700;display:block;margin-bottom:3px;}
 .card{
   background:linear-gradient(135deg,var(--dark2),var(--dark3));
   border:1px solid var(--border2);border-radius:18px;
@@ -470,6 +493,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <div class="fade-in">
     <div class="section-title">🔬 Simulador Interactivo</div>
     <p class="section-desc">Ajusta voltaje y resistencia — la corriente se calcula automáticamente en tiempo real.</p>
+    <div class="purpose-box">
+      <span class="purpose-icon">🎯</span>
+      <div class="purpose-text"><span class="purpose-label">¿Para qué sirve?</span>Te deja <strong>experimentar en vivo</strong> con la Ley de Ohm: mueve los sliders de V y R, y observa de inmediato cómo cambian la corriente, la potencia, el circuito 3D y el flujo de electrones — sin necesidad de hacer cálculos a mano.</div>
+    </div>
     <div class="card" style="padding:14px 14px 18px;">
       <canvas id="circuitCanvas"></canvas>
       <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;">🖱 Arrastra para rotar · toca en móvil</p>
@@ -513,6 +540,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <div class="fade-in">
     <div class="section-title">📐 Visualización Vectorial</div>
     <p class="section-desc">Cada flecha es proporcional al valor de la variable. Cambia los sliders y observa cómo varían.</p>
+    <div class="purpose-box">
+      <span class="purpose-icon">📏</span>
+      <div class="purpose-text"><span class="purpose-label">¿Para qué sirve?</span>Ayuda a <strong>comparar visualmente</strong> la magnitud de V, I y R al mismo tiempo. Entre más larga la flecha, mayor el valor — útil para entender de un vistazo qué variable domina en el circuito.</div>
+    </div>
     <div class="card">
       <svg id="vectorCanvas" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
@@ -523,6 +554,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <div class="fade-in">
     <div class="section-title">🔺 Triángulo de Ohm</div>
     <p class="section-desc">Toca V, I o R para ver cómo despejar cada variable de la ecuación.</p>
+    <div class="purpose-box">
+      <span class="purpose-icon">🧠</span>
+      <div class="purpose-text"><span class="purpose-label">¿Para qué sirve?</span>Es una <strong>herramienta de memoria</strong>: tapa mentalmente la variable que quieres encontrar y el triángulo te muestra automáticamente la fórmula correcta para despejarla, sin tener que memorizar las tres ecuaciones por separado.</div>
+    </div>
     <div class="tri-grid">
       <div class="card">
         <div class="triangle-wrap">
@@ -547,6 +582,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <div class="fade-in">
     <div class="section-title">📊 Gráfica V–I</div>
     <p class="section-desc">Relación lineal entre voltaje y corriente. La pendiente de la recta es la resistencia R.</p>
+    <div class="purpose-box">
+      <span class="purpose-icon">📈</span>
+      <div class="purpose-text"><span class="purpose-label">¿Para qué sirve?</span>Muestra <strong>cómo se comporta el circuito</strong> en todo el rango de voltaje, no solo en el punto actual. La inclinación de la línea revela qué tan resistivo es el circuito: mientras más empinada, menor la resistencia.</div>
+    </div>
     <div class="card" style="padding:14px;">
       <canvas id="graphCanvas" width="700" height="260" style="width:100%;height:auto;border-radius:8px;"></canvas>
     </div>
@@ -557,6 +596,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <div class="fade-in">
     <div class="section-title">🧮 Calculadora de Ohm</div>
     <p class="section-desc">Elige qué calcular, ingresa dos valores y obtén el tercero con pasos detallados.</p>
+    <div class="purpose-box">
+      <span class="purpose-icon">✏️</span>
+      <div class="purpose-text"><span class="purpose-label">¿Para qué sirve?</span>Está pensada para <strong>resolver ejercicios reales</strong>: ingresa los datos que ya conoces (de un problema o un circuito real) y obtén el valor faltante junto con el procedimiento paso a paso, ideal para revisar tareas o estudiar para un examen.</div>
+    </div>
     <div class="calc-grid" id="calcGrid">
       <div class="card">
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;">
@@ -592,7 +635,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
 <!-- MUSIC PLAYER -->
 <div id="musicPlayer">
-  <button class="mp-icon" id="mpBtn" onclick="toggleMusic()">
+  <button class="mp-icon" id="mpBtn" onclick="toggleMusic()" title="Reproductor de música: pon o quita música de fondo mientras estudias">
     <svg id="mpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     <svg id="mpPauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
   </button>
@@ -632,7 +675,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
       </button>
     </div>
   </div>
-  <button id="karenToggle" onclick="toggleChat()">
+  <button id="karenToggle" onclick="toggleChat()" title="Karen IA: chatea y hazle preguntas sobre la Ley de Ohm y circuitos eléctricos">
     <img src="karen.jpeg" alt="Karen" onerror="this.outerHTML='<button id=\'karenToggle\' onclick=\'toggleChat()\'><div class=\'karen-toggle-fb\'>K</div><span class=\'karen-badge\'></span></button>'">
     <span class="karen-badge"></span>
   </button>
